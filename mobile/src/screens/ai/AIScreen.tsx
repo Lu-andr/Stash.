@@ -220,7 +220,7 @@ export const AIScreen: React.FC = () => {
               <Ionicons
                 name="arrow-up"
                 size={18}
-                color={!input.trim() || isLoading ? Colors.textMuted : '#FFFFFF'}
+                color={!input.trim() || isLoading ? Colors.textMuted : Colors.onSilver}
               />
             </TouchableOpacity>
           </View>

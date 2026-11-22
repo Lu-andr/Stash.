@@ -255,7 +255,7 @@ export const PreviewScreen: React.FC = () => {
             accessibilityLabel="Close preview"
             accessibilityRole="button"
           >
-            <Ionicons name="close" size={20} color={Palette.bgBase} />
+            <Ionicons name="close" size={20} color={Colors.text} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Screen Preview</Text>
           <Text style={styles.headerSub}>A · B · C</Text>
@@ -356,12 +356,12 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: Typography.xl,
     fontWeight: Typography.semibold,
-    color: Palette.bgBase,
+    color: Colors.text,
     letterSpacing: -0.3,
   },
   headerSub: {
     fontSize: 12,
-    color: 'rgba(0,0,0,0.4)',
+    color: Colors.textSecondary,
     fontWeight: Typography.medium,
   },
 
@@ -378,7 +378,7 @@ const styles = StyleSheet.create({
   frameLabel: {
     fontSize: 11,
     fontWeight: Typography.semibold,
-    color: 'rgba(0,0,0,0.5)',
+    color: Colors.textSecondary,
     letterSpacing: 0.3,
   },
   phoneBody: {
