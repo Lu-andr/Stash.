@@ -8,7 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 
-import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Palette, Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
 import { PrimaryButton } from '../../components/ui/PrimaryButton';
 import { MOCK_CATEGORIES, addMockTransaction } from '../../data/mockData';
 
@@ -38,7 +38,7 @@ function GlossyKey({ label, onPress }: { label: string; onPress: () => void }) {
         accessibilityLabel={label === '⌫' ? 'Backspace' : label}
       >
         <LinearGradient
-          colors={['#262629', '#1A1A1D']}
+          colors={[Palette.detailTop, Palette.detailBottom]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.key}
@@ -175,7 +175,7 @@ export const AddTransactionScreen: React.FC = () => {
                       accessibilityState={{ selected: isSelected }}
                     >
                       <LinearGradient
-                        colors={isSelected ? Gradients.silver : ['#262629', '#1A1A1D']}
+                        colors={isSelected ? Gradients.silver : [Palette.detailTop, Palette.detailBottom]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 0, y: 1 }}
                         style={[styles.categoryChip, isSelected && styles.categoryChipActive]}

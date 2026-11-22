@@ -1,3 +1,4 @@
+import { Palette } from '../constants/theme';
 // ─── Mock Data — Foundry Money Tracker ─────────────────────────────────────
 // All UI data comes from here. No network calls.
 
@@ -246,46 +247,46 @@ export const MOCK_ANALYTICS_CURRENT_MONTH = 'Sep';
 // Per-month category breakdown (for the selected month card)
 export const MOCK_CATEGORY_BREAKDOWN: Record<string, CategorySpend[]> = {
   Apr: [
-    { name: 'Food & Dining',  amount: 4200,  iconName: 'fast-food-outline',    color: '#FAFAFB' },
-    { name: 'Transport',      amount: 2100,  iconName: 'car-outline',           color: '#A0A0A5' },
-    { name: 'Shopping',       amount: 5200,  iconName: 'bag-handle-outline',    color: '#6A6A6F' },
-    { name: 'Entertainment',  amount: 1800,  iconName: 'tv-outline',            color: '#4A4A4F' },
-    { name: 'Bills & Utilities', amount: 900, iconName: 'receipt-outline',      color: '#3A3A3E' },
+    { name: 'Food & Dining',  amount: 4200,  iconName: 'fast-food-outline',    color: Palette.silverTop },
+    { name: 'Transport',      amount: 2100,  iconName: 'car-outline',           color: Palette.chartSoft },
+    { name: 'Shopping',       amount: 5200,  iconName: 'bag-handle-outline',    color: Palette.chartMid },
+    { name: 'Entertainment',  amount: 1800,  iconName: 'tv-outline',            color: Palette.chartMuted },
+    { name: 'Bills & Utilities', amount: 900, iconName: 'receipt-outline',      color: Palette.chartMuted },
   ],
   May: [
-    { name: 'Food & Dining',  amount: 5800,  iconName: 'fast-food-outline',    color: '#FAFAFB' },
-    { name: 'Shopping',       amount: 7200,  iconName: 'bag-handle-outline',    color: '#A0A0A5' },
-    { name: 'Transport',      amount: 2400,  iconName: 'car-outline',           color: '#6A6A6F' },
-    { name: 'Entertainment',  amount: 2100,  iconName: 'tv-outline',            color: '#4A4A4F' },
-    { name: 'Bills & Utilities', amount: 1000, iconName: 'receipt-outline',    color: '#3A3A3E' },
+    { name: 'Food & Dining',  amount: 5800,  iconName: 'fast-food-outline',    color: Palette.silverTop },
+    { name: 'Shopping',       amount: 7200,  iconName: 'bag-handle-outline',    color: Palette.chartSoft },
+    { name: 'Transport',      amount: 2400,  iconName: 'car-outline',           color: Palette.chartMid },
+    { name: 'Entertainment',  amount: 2100,  iconName: 'tv-outline',            color: Palette.chartMuted },
+    { name: 'Bills & Utilities', amount: 1000, iconName: 'receipt-outline',    color: Palette.chartMuted },
   ],
   Jun: [
-    { name: 'Food & Dining',  amount: 3900,  iconName: 'fast-food-outline',    color: '#FAFAFB' },
-    { name: 'Transport',      amount: 2800,  iconName: 'car-outline',           color: '#A0A0A5' },
-    { name: 'Health',         amount: 2200,  iconName: 'medkit-outline',        color: '#6A6A6F' },
-    { name: 'Bills & Utilities', amount: 2400, iconName: 'receipt-outline',    color: '#4A4A4F' },
-    { name: 'Entertainment',  amount: 1500,  iconName: 'tv-outline',            color: '#3A3A3E' },
+    { name: 'Food & Dining',  amount: 3900,  iconName: 'fast-food-outline',    color: Palette.silverTop },
+    { name: 'Transport',      amount: 2800,  iconName: 'car-outline',           color: Palette.chartSoft },
+    { name: 'Health',         amount: 2200,  iconName: 'medkit-outline',        color: Palette.chartMid },
+    { name: 'Bills & Utilities', amount: 2400, iconName: 'receipt-outline',    color: Palette.chartMuted },
+    { name: 'Entertainment',  amount: 1500,  iconName: 'tv-outline',            color: Palette.chartMuted },
   ],
   Jul: [
-    { name: 'Shopping',       amount: 8200,  iconName: 'bag-handle-outline',    color: '#FAFAFB' },
-    { name: 'Food & Dining',  amount: 5600,  iconName: 'fast-food-outline',    color: '#A0A0A5' },
-    { name: 'Transport',      amount: 3200,  iconName: 'car-outline',           color: '#6A6A6F' },
-    { name: 'Entertainment',  amount: 2500,  iconName: 'tv-outline',            color: '#4A4A4F' },
-    { name: 'Bills & Utilities', amount: 1500, iconName: 'receipt-outline',    color: '#3A3A3E' },
+    { name: 'Shopping',       amount: 8200,  iconName: 'bag-handle-outline',    color: Palette.silverTop },
+    { name: 'Food & Dining',  amount: 5600,  iconName: 'fast-food-outline',    color: Palette.chartSoft },
+    { name: 'Transport',      amount: 3200,  iconName: 'car-outline',           color: Palette.chartMid },
+    { name: 'Entertainment',  amount: 2500,  iconName: 'tv-outline',            color: Palette.chartMuted },
+    { name: 'Bills & Utilities', amount: 1500, iconName: 'receipt-outline',    color: Palette.chartMuted },
   ],
   Aug: [
-    { name: 'Food & Dining',  amount: 5200,  iconName: 'fast-food-outline',    color: '#FAFAFB' },
-    { name: 'Transport',      amount: 4100,  iconName: 'car-outline',           color: '#A0A0A5' },
-    { name: 'Shopping',       amount: 3800,  iconName: 'bag-handle-outline',    color: '#6A6A6F' },
-    { name: 'Bills & Utilities', amount: 2200, iconName: 'receipt-outline',    color: '#4A4A4F' },
-    { name: 'Health',         amount: 1100,  iconName: 'medkit-outline',        color: '#3A3A3E' },
+    { name: 'Food & Dining',  amount: 5200,  iconName: 'fast-food-outline',    color: Palette.silverTop },
+    { name: 'Transport',      amount: 4100,  iconName: 'car-outline',           color: Palette.chartSoft },
+    { name: 'Shopping',       amount: 3800,  iconName: 'bag-handle-outline',    color: Palette.chartMid },
+    { name: 'Bills & Utilities', amount: 2200, iconName: 'receipt-outline',    color: Palette.chartMuted },
+    { name: 'Health',         amount: 1100,  iconName: 'medkit-outline',        color: Palette.chartMuted },
   ],
   Sep: [
-    { name: 'Food & Dining',  amount: 4250,  iconName: 'fast-food-outline',    color: '#FAFAFB' },
-    { name: 'Transport',      amount: 1800,  iconName: 'car-outline',           color: '#A0A0A5' },
-    { name: 'Shopping',       amount: 3000,  iconName: 'bag-handle-outline',    color: '#6A6A6F' },
-    { name: 'Entertainment',  amount: 1200,  iconName: 'tv-outline',            color: '#4A4A4F' },
-    { name: 'Bills & Utilities', amount: 1000, iconName: 'receipt-outline',    color: '#3A3A3E' },
+    { name: 'Food & Dining',  amount: 4250,  iconName: 'fast-food-outline',    color: Palette.silverTop },
+    { name: 'Transport',      amount: 1800,  iconName: 'car-outline',           color: Palette.chartSoft },
+    { name: 'Shopping',       amount: 3000,  iconName: 'bag-handle-outline',    color: Palette.chartMid },
+    { name: 'Entertainment',  amount: 1200,  iconName: 'tv-outline',            color: Palette.chartMuted },
+    { name: 'Bills & Utilities', amount: 1000, iconName: 'receipt-outline',    color: Palette.chartMuted },
   ],
 };
 

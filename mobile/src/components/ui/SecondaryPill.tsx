@@ -1,7 +1,7 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Typography, Radius, Gradients } from '../../constants/theme';
+import { Palette, Colors, Typography, Radius, Gradients } from '../../constants/theme';
 
 interface SecondaryPillProps {
   label: string;
@@ -17,7 +17,7 @@ export const SecondaryPill: React.FC<SecondaryPillProps> = ({ label, onPress }) 
       style={styles.touch}
     >
       <LinearGradient
-        colors={['#2C2C30', '#1A1A1D']}
+        colors={[Palette.detailTop, Palette.detailBottom]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.pill}

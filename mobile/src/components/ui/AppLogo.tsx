@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Gradients, Typography, Radius } from '../../constants/theme';
+import { Palette, Colors, Gradients, Typography, Radius } from '../../constants/theme';
 
 interface AppLogoProps {
   size?: 'sm' | 'md';
@@ -15,7 +15,7 @@ export const AppLogo: React.FC<AppLogoProps> = ({ size = 'md' }) => {
     <View style={styles.container}>
       {/* 28px glossy dark circle monogram */}
       <LinearGradient
-        colors={['#2A2A2D', '#141416']}
+        colors={[Palette.detailTop, Palette.detailBottom]}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={[

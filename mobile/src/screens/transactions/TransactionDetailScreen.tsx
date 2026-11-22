@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
 import { api } from '../../services/api';
 import { API_ENDPOINTS } from '../../constants/api';
 import { Transaction } from '../../types';
@@ -180,7 +180,7 @@ export const TransactionDetailScreen: React.FC = () => {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Amount Hero */}
         <View style={styles.heroCard}>
-          <View style={[styles.categoryBadge, { backgroundColor: isIncome ? 'rgba(124,224,166,0.15)' : 'rgba(255,255,255,0.08)' }]}>
+          <View style={[styles.categoryBadge, { backgroundColor: isIncome ? 'rgba(124,224,166,0.15)' : Palette.borderHairline }]}>
             <Ionicons
               name={resolveCategoryIcon(
                 route.params.iconName,
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: Spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: Palette.borderHairline,
   },
   amount: {
     fontSize: 38,

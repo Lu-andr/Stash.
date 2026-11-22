@@ -9,7 +9,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 
-import {
+import { Palette,
   Colors, Gradients, Typography, Spacing, Radius, Shadow,
 } from '../../constants/theme';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
@@ -112,7 +112,7 @@ export const AccountsScreen: React.FC = () => {
         >
           {/* Net worth summary pill */}
           <LinearGradient
-            colors={['#2C2C30', '#1A1A1D']}
+            colors={[Palette.detailTop, Palette.detailBottom]}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={styles.netWorthCard}

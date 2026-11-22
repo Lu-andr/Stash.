@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
 import { EmptyState } from '../../components/common/EmptyState';
 import { TransactionSkeleton } from '../../components/common/LoadingSkeleton';
 import { useTransactions } from '../../hooks/useTransactions';
@@ -147,7 +147,7 @@ export const TransactionsScreen: React.FC = () => {
           onPress={() => navigation.navigate('AddTransaction' as any, {})}
           activeOpacity={0.8}
         >
-          <Ionicons name="add" size={20} color="#0A0A0B" />
+          <Ionicons name="add" size={20} color={Palette.bgBase} />
         </TouchableOpacity>
       </View>
 
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   addBtn: {
-    width: 40, height: 40, borderRadius: 20, backgroundColor: '#FAFAFB',
+    width: 40, height: 40, borderRadius: 20, backgroundColor: Palette.silverTop,
     alignItems: 'center', justifyContent: 'center',
   },
 

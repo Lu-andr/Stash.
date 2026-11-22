@@ -3,7 +3,7 @@ import {
   TouchableOpacity, Text, StyleSheet, ActivityIndicator,
   TouchableOpacityProps,
 } from 'react-native';
-import { Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
 
 interface ButtonProps extends TouchableOpacityProps {
   title: string;
@@ -51,7 +51,7 @@ export const Button: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' ? '#0A0A0B' : Colors.text}
+          color={variant === 'primary' ? Palette.bgBase : Colors.text}
           size="small"
         />
       ) : (
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
 
   // Variants
   variant_primary: {
-    backgroundColor: '#FAFAFB',
+    backgroundColor: Palette.silverTop,
   },
   variant_secondary: {
     backgroundColor: Colors.surfaceAlt,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     fontWeight: Typography.semibold,
     textAlign: 'center',
   },
-  text_primary: { color: '#0A0A0B' },
+  text_primary: { color: Palette.bgBase },
   text_secondary: { color: Colors.text },
   text_ghost: { color: Colors.primary },
   text_danger: { color: Colors.error },

@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Animated, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Gradients, Typography, Radius, Shadow } from '../../constants/theme';
+import { Palette, Colors, Gradients, Typography, Radius, Shadow } from '../../constants/theme';
 
 interface PrimaryButtonProps {
   label: string;
@@ -35,7 +35,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         style={styles.touch}
       >
         <LinearGradient
-          colors={disabled ? ['#3A3A3E', '#2A2A2E'] : Gradients.silver}
+          colors={disabled ? [Palette.chartMuted, Palette.bgRaisedAlt] : Gradients.silver}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.gradient}

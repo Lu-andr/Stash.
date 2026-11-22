@@ -1,13 +1,27 @@
+import { Palette } from './src/constants/theme';
 import 'react-native-gesture-handler';
 import React from 'react';
 import { View, ActivityIndicator } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { DarkTheme, NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { AuthProvider } from './src/context/AuthContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
+
+const navigationTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary: Palette.silverTop,
+    background: Palette.bgBase,
+    card: Palette.bgInset,
+    text: Palette.textPrimary,
+    border: Palette.borderHairline,
+    notification: Palette.danger,
+  },
+};
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -27,8 +41,8 @@ export default function App() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#0A0A0B', justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#FAFAFB" />
+      <View style={{ flex: 1, backgroundColor: Palette.bgBase, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={Palette.silverTop} />
       </View>
     );
   }
@@ -36,7 +50,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <NavigationContainer>
+        <NavigationContainer theme={navigationTheme}>
           <AppNavigator />
         </NavigationContainer>
         <StatusBar style="light" />

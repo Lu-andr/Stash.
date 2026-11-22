@@ -7,7 +7,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -151,7 +151,7 @@ export const RegisterScreen: React.FC = () => {
               activeOpacity={0.88}
             >
               {isLoading
-                ? <ActivityIndicator size="small" color="#0A0A0B" />
+                ? <ActivityIndicator size="small" color={Palette.bgBase} />
                 : <Text style={styles.primaryBtnText}>Create Account</Text>
               }
             </TouchableOpacity>
@@ -209,11 +209,11 @@ const styles = StyleSheet.create({
   hintText: { fontSize: Typography.xs, color: Colors.textMuted },
 
   primaryBtn: {
-    backgroundColor: '#FAFAFB', borderRadius: Radius.full,
+    backgroundColor: Palette.silverTop, borderRadius: Radius.full,
     height: 56, alignItems: 'center', justifyContent: 'center', marginTop: Spacing.sm,
   },
   btnDisabled: { opacity: 0.65 },
-  primaryBtnText: { fontSize: Typography.base, fontWeight: Typography.bold, color: '#0A0A0B', letterSpacing: 0.3 },
+  primaryBtnText: { fontSize: Typography.base, fontWeight: Typography.bold, color: Palette.bgBase, letterSpacing: 0.3 },
 
   termsText: { fontSize: Typography.xs, color: Colors.textMuted, textAlign: 'center', lineHeight: 18 },
   termsLink: { color: Colors.textSecondary, fontWeight: Typography.medium },

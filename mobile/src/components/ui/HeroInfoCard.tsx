@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, {
   Rect, Circle, Line, Path, Polygon, Defs, LinearGradient as SvgLinearGradient, Stop,
 } from 'react-native-svg';
-import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Palette, Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
 import { SecondaryPill } from './SecondaryPill';
 
 interface HeroInfoCardProps {
@@ -20,7 +20,7 @@ function MonochromeIllustration() {
     <View style={{ transform: [{ rotate: '-6deg' }] }}>
       <Svg width={88} height={88} viewBox="0 0 88 88" fill="none">
         {/* Easel panel — dark card */}
-        <Rect x="12" y="8" width="64" height="52" rx="8" fill="#1F1F22" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        <Rect x="12" y="8" width="64" height="52" rx="8" fill={Palette.bgRaisedTop} stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
         {/* Inner panel highlight */}
         <Rect x="12" y="8" width="64" height="1" rx="0.5" fill="rgba(255,255,255,0.15)" />
 
@@ -30,23 +30,23 @@ function MonochromeIllustration() {
         <Line x1="18" y1="30" x2="70" y2="30" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
 
         {/* Bar chart — monochrome shades */}
-        <Rect x="20" y="34" width="10" height="12" rx="3" fill="#3A3A3E" />
-        <Rect x="34" y="28" width="10" height="18" rx="3" fill="#4A4A4E" />
-        <Rect x="48" y="20" width="10" height="26" rx="3" fill="#5A5A5E" />
+        <Rect x="20" y="34" width="10" height="12" rx="3" fill={Palette.chartMuted} />
+        <Rect x="34" y="28" width="10" height="18" rx="3" fill={Palette.chartMid} />
+        <Rect x="48" y="20" width="10" height="26" rx="3" fill={Palette.chartSoft} />
         {/* Silver highlighted bar */}
         <Rect x="62" y="14" width="8" height="32" rx="3" fill="url(#silver_bar)" />
 
         {/* Rising trend line */}
         <Path
           d="M20 44 L30 36 L44 30 L58 22 L68 16"
-          stroke="#FAFAFB"
+          stroke={Palette.silverTop}
           strokeWidth="1.5"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeDasharray="2,2"
         />
         {/* Line endpoint dot */}
-        <Circle cx="68" cy="16" r="3" fill="#FAFAFB" />
+        <Circle cx="68" cy="16" r="3" fill={Palette.silverTop} />
 
         {/* Easel legs */}
         <Line x1="28" y1="60" x2="22" y2="80" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round" />
@@ -54,18 +54,18 @@ function MonochromeIllustration() {
         <Line x1="44" y1="60" x2="44" y2="78" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeLinecap="round" />
 
         {/* Coin stack */}
-        <Polygon points="8,78 20,74 32,78 20,82" fill="#2A2A2E" />
-        <Polygon points="8,74 20,70 32,74 20,78" fill="#3A3A3E" />
-        <Polygon points="8,70 20,66 32,70 20,74" fill="#4A4A4E" />
-        <Polygon points="8,66 20,62 32,66 20,70" fill="#C8C8CD" />
+        <Polygon points="8,78 20,74 32,78 20,82" fill={Palette.bgRaisedAlt} />
+        <Polygon points="8,74 20,70 32,74 20,78" fill={Palette.chartMuted} />
+        <Polygon points="8,70 20,66 32,70 20,74" fill={Palette.chartMid} />
+        <Polygon points="8,66 20,62 32,66 20,70" fill={Palette.silverBottom} />
         {/* Top coin highlight */}
         <Path d="M8,66 Q20,62 32,66" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
 
         {/* SVG gradient def */}
         <Defs>
           <SvgLinearGradient id="silver_bar" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0%" stopColor="#FAFAFB" />
-            <Stop offset="100%" stopColor="#C8C8CD" />
+            <Stop offset="0%" stopColor={Palette.silverTop} />
+            <Stop offset="100%" stopColor={Palette.silverBottom} />
           </SvgLinearGradient>
         </Defs>
       </Svg>

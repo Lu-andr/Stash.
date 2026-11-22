@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
 import { useAuth } from '../../context/AuthContext';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 
@@ -127,7 +127,7 @@ export const LoginScreen: React.FC = () => {
               activeOpacity={0.88}
             >
               {isLoading
-                ? <ActivityIndicator size="small" color="#0A0A0B" />
+                ? <ActivityIndicator size="small" color={Palette.bgBase} />
                 : <Text style={styles.primaryBtnText}>Sign In</Text>
               }
             </TouchableOpacity>
@@ -196,12 +196,12 @@ const styles = StyleSheet.create({
   eyeBtn: { padding: Spacing.xs },
 
   primaryBtn: {
-    backgroundColor: '#FAFAFB', borderRadius: Radius.full,
+    backgroundColor: Palette.silverTop, borderRadius: Radius.full,
     height: 56, alignItems: 'center', justifyContent: 'center',
     marginTop: Spacing.sm,
   },
   btnDisabled: { opacity: 0.65 },
-  primaryBtnText: { fontSize: Typography.base, fontWeight: Typography.bold, color: '#0A0A0B', letterSpacing: 0.3 },
+  primaryBtnText: { fontSize: Typography.base, fontWeight: Typography.bold, color: Palette.bgBase, letterSpacing: 0.3 },
 
   dividerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   dividerLine: { flex: 1, height: 1, backgroundColor: Colors.border },

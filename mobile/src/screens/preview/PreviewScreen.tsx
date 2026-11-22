@@ -10,20 +10,20 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 
-import { Colors, Gradients, Typography, Spacing, Radius } from '../../constants/theme';
+import { Palette, Colors, Gradients, Typography, Spacing, Radius } from '../../constants/theme';
 
 // Micro-previews of each screen rendered as rich static cards
 // These are deliberate simplified-render cards, not full screen embeds
 
 const PHONE_W = 220;
 const PHONE_H = 420;
-const CANVAS_COLOR = '#8E8E8E';
+const CANVAS_COLOR = Palette.bgInset;
 
 // ── Mini Onboarding Preview ───────────────────────────────────────────────────
 function OnboardingPreview() {
   return (
     <LinearGradient
-      colors={['#DADADD', '#8A8A8F', '#1C1C1E', '#0A0A0B']}
+      colors={[Palette.heroFade0, Palette.heroFade1, Palette.heroFade2, Palette.bgBase]}
       locations={[0, 0.28, 0.62, 1]}
       style={styles.screenFill}
     >
@@ -35,7 +35,7 @@ function OnboardingPreview() {
 
       {/* Logo */}
       <View style={styles.miniLogo}>
-        <LinearGradient colors={['#2A2A2D', '#141416']} style={styles.miniLogoCircle}>
+        <LinearGradient colors={[Palette.detailTop, Palette.detailBottom]} style={styles.miniLogoCircle}>
           <Text style={styles.miniLogoText}>S</Text>
         </LinearGradient>
         <Text style={styles.miniWordmark}>Stash</Text>
@@ -57,7 +57,7 @@ function OnboardingPreview() {
 
         {/* Silver button */}
         <LinearGradient
-          colors={['#FAFAFB', '#C8C8CD']}
+          colors={[Palette.silverTop, Palette.silverBottom]}
           style={styles.miniPrimaryBtn}
         >
           <Text style={styles.miniPrimaryBtnText}>Get Started</Text>
@@ -70,17 +70,17 @@ function OnboardingPreview() {
 // ── Mini Home Preview ─────────────────────────────────────────────────────────
 function HomePreview() {
   return (
-    <View style={[styles.screenFill, { backgroundColor: '#0A0A0B', paddingHorizontal: 12, paddingTop: 14 }]}>
+    <View style={[styles.screenFill, { backgroundColor: Palette.bgBase, paddingHorizontal: 12, paddingTop: 14 }]}>
       {/* Top row */}
       <View style={styles.miniTopRow}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-          <LinearGradient colors={['#2A2A2D', '#141416']} style={[styles.miniLogoCircle, { width: 16, height: 16 }]}>
-            <Text style={{ color: '#F5F5F7', fontSize: 7, fontWeight: '700' }}>S</Text>
+          <LinearGradient colors={[Palette.detailTop, Palette.detailBottom]} style={[styles.miniLogoCircle, { width: 16, height: 16 }]}>
+            <Text style={{ color: Palette.textPrimary, fontSize: 7, fontWeight: '700' }}>S</Text>
           </LinearGradient>
-          <Text style={{ color: '#F5F5F7', fontSize: 9, fontWeight: '600' }}>Stash</Text>
+          <Text style={{ color: Palette.textPrimary, fontSize: 9, fontWeight: '600' }}>Stash</Text>
         </View>
         <View style={styles.miniMenuBtn}>
-          <Ionicons name="menu-outline" size={10} color="#A1A1A6" />
+          <Ionicons name="menu-outline" size={10} color={Palette.textSecondary} />
         </View>
       </View>
 
@@ -88,52 +88,52 @@ function HomePreview() {
       <View style={{ marginTop: 10, gap: 1 }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Text style={styles.miniDisplayPrimary}>Keep </Text>
-          <View style={styles.miniChip}><Ionicons name="cash-outline" size={8} color="#FAFAFB" /></View>
+          <View style={styles.miniChip}><Ionicons name="cash-outline" size={8} color={Palette.silverTop} /></View>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
           <Text style={styles.miniDisplaySecondary}>Your Money </Text>
-          <View style={styles.miniChip}><Ionicons name="bar-chart-outline" size={8} color="#FAFAFB" /></View>
+          <View style={styles.miniChip}><Ionicons name="bar-chart-outline" size={8} color={Palette.silverTop} /></View>
         </View>
         <Text style={styles.miniDisplayPrimary}>Simple</Text>
       </View>
 
       {/* Search bar */}
       <View style={styles.miniSearchBar}>
-        <Ionicons name="search-outline" size={9} color="#86868C" />
-        <Text style={{ color: '#86868C', fontSize: 9, marginLeft: 4 }}>Search transactions</Text>
+        <Ionicons name="search-outline" size={9} color={Palette.textMuted} />
+        <Text style={{ color: Palette.textMuted, fontSize: 9, marginLeft: 4 }}>Search transactions</Text>
       </View>
 
       {/* Featured pill */}
-      <LinearGradient colors={['#1F1F22', '#151517']} style={styles.miniFeaturedPill}>
-        <LinearGradient colors={['#FAFAFB', '#C8C8CD']} style={styles.miniIconTile}>
-          <Ionicons name="wallet-outline" size={9} color="#0A0A0B" />
+      <LinearGradient colors={[Palette.bgRaisedTop, Palette.bgRaisedBottom]} style={styles.miniFeaturedPill}>
+        <LinearGradient colors={[Palette.silverTop, Palette.silverBottom]} style={styles.miniIconTile}>
+          <Ionicons name="wallet-outline" size={9} color={Palette.bgBase} />
         </LinearGradient>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: '#F5F5F7', fontSize: 8, fontWeight: '600' }}>Balance ₹1,24,580.50</Text>
-          <Text style={{ color: '#A1A1A6', fontSize: 7 }}>₹640 safe to spend today</Text>
+          <Text style={{ color: Palette.textPrimary, fontSize: 8, fontWeight: '600' }}>Balance ₹1,24,580.50</Text>
+          <Text style={{ color: Palette.textSecondary, fontSize: 7 }}>₹640 safe to spend today</Text>
         </View>
       </LinearGradient>
 
       {/* Transaction rows */}
       {[
-        { m: 'Swiggy', a: '−₹480', c: '#F5F5F7' },
-        { m: 'Uber',   a: '−₹212', c: '#F5F5F7' },
-        { m: 'Netflix',a: '−₹649', c: '#F5F5F7' },
+        { m: 'Swiggy', a: '−₹480', c: Palette.textPrimary },
+        { m: 'Uber',   a: '−₹212', c: Palette.textPrimary },
+        { m: 'Netflix',a: '−₹649', c: Palette.textPrimary },
         { m: 'Salary', a: '+₹85,000', c: '#7CE0A6' },
       ].map(t => (
-        <LinearGradient key={t.m} colors={['#1F1F22', '#151517']} style={styles.miniTxnRow}>
+        <LinearGradient key={t.m} colors={[Palette.bgRaisedTop, Palette.bgRaisedBottom]} style={styles.miniTxnRow}>
           <View style={styles.miniTxnIcon} />
-          <Text style={{ color: '#F5F5F7', fontSize: 8, flex: 1, fontWeight: '600' }}>{t.m}</Text>
+          <Text style={{ color: Palette.textPrimary, fontSize: 8, flex: 1, fontWeight: '600' }}>{t.m}</Text>
           <Text style={{ color: t.c, fontSize: 8, fontWeight: '600' }}>{t.a}</Text>
         </LinearGradient>
       ))}
 
       {/* Floating nav bar */}
       <View style={styles.miniFloatNav}>
-        <LinearGradient colors={['#FAFAFB', '#C8C8CD']} style={styles.miniNavBtn} />
-        <View style={[styles.miniNavBtn, { backgroundColor: '#232326' }]} />
-        <View style={[styles.miniNavBtn, { backgroundColor: '#232326' }]} />
-        <LinearGradient colors={['#FAFAFB', '#C8C8CD']} style={[styles.miniNavBtn, { width: 22, height: 22, borderRadius: 11 }]} />
+        <LinearGradient colors={[Palette.silverTop, Palette.silverBottom]} style={styles.miniNavBtn} />
+        <View style={[styles.miniNavBtn, { backgroundColor: Palette.bgRaisedAlt }]} />
+        <View style={[styles.miniNavBtn, { backgroundColor: Palette.bgRaisedAlt }]} />
+        <LinearGradient colors={[Palette.silverTop, Palette.silverBottom]} style={[styles.miniNavBtn, { width: 22, height: 22, borderRadius: 11 }]} />
       </View>
     </View>
   );
@@ -142,42 +142,42 @@ function HomePreview() {
 // ── Mini Insights Preview ─────────────────────────────────────────────────────
 function InsightsPreview() {
   return (
-    <View style={[styles.screenFill, { backgroundColor: '#0A0A0B', paddingHorizontal: 12, paddingTop: 14 }]}>
+    <View style={[styles.screenFill, { backgroundColor: Palette.bgBase, paddingHorizontal: 12, paddingTop: 14 }]}>
       {/* Hero info card */}
-      <LinearGradient colors={['#1F1F22', '#151517']} style={styles.miniHeroCard}>
+      <LinearGradient colors={[Palette.bgRaisedTop, Palette.bgRaisedBottom]} style={styles.miniHeroCard}>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: '#F5F5F7', fontSize: 9, fontWeight: '600', marginBottom: 4 }}>Budget Alerts</Text>
-          <Text style={{ color: '#A1A1A6', fontSize: 7.5, lineHeight: 11 }}>
+          <Text style={{ color: Palette.textPrimary, fontSize: 9, fontWeight: '600', marginBottom: 4 }}>Budget Alerts</Text>
+          <Text style={{ color: Palette.textSecondary, fontSize: 7.5, lineHeight: 11 }}>
             Get notified before you overspend on food, travel or shopping.
           </Text>
-          <LinearGradient colors={['#262629', '#1A1A1D']} style={styles.miniSecPill}>
-            <Text style={{ color: '#F5F5F7', fontSize: 7, fontWeight: '600' }}>Enable</Text>
+          <LinearGradient colors={[Palette.detailTop, Palette.detailBottom]} style={styles.miniSecPill}>
+            <Text style={{ color: Palette.textPrimary, fontSize: 7, fontWeight: '600' }}>Enable</Text>
           </LinearGradient>
         </View>
         <View style={styles.miniIllustration}>
-          <Ionicons name="bar-chart-outline" size={28} color="#3A3A3E" />
+          <Ionicons name="bar-chart-outline" size={28} color={Palette.chartMuted} />
         </View>
       </LinearGradient>
 
       {/* Featured pill */}
-      <LinearGradient colors={['#1F1F22', '#151517']} style={styles.miniFeaturedPill}>
-        <LinearGradient colors={['#FAFAFB', '#C8C8CD']} style={styles.miniIconTile}>
-          <Ionicons name="sparkles-outline" size={9} color="#0A0A0B" />
+      <LinearGradient colors={[Palette.bgRaisedTop, Palette.bgRaisedBottom]} style={styles.miniFeaturedPill}>
+        <LinearGradient colors={[Palette.silverTop, Palette.silverBottom]} style={styles.miniIconTile}>
+          <Ionicons name="sparkles-outline" size={9} color={Palette.bgBase} />
         </LinearGradient>
         <View style={{ flex: 1 }}>
-          <Text style={{ color: '#F5F5F7', fontSize: 8, fontWeight: '600' }}>Smart Rules</Text>
-          <Text style={{ color: '#A1A1A6', fontSize: 7 }}>Auto-categorize your transactions</Text>
+          <Text style={{ color: Palette.textPrimary, fontSize: 8, fontWeight: '600' }}>Smart Rules</Text>
+          <Text style={{ color: Palette.textSecondary, fontSize: 7 }}>Auto-categorize your transactions</Text>
         </View>
       </LinearGradient>
 
       {/* Budget progress */}
       <View style={{ marginBottom: 8 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 }}>
-          <Text style={{ color: '#F5F5F7', fontSize: 8, fontWeight: '600' }}>Budget Health</Text>
-          <Text style={{ color: '#A1A1A6', fontSize: 7 }}>72% used</Text>
+          <Text style={{ color: Palette.textPrimary, fontSize: 8, fontWeight: '600' }}>Budget Health</Text>
+          <Text style={{ color: Palette.textSecondary, fontSize: 7 }}>72% used</Text>
         </View>
         <View style={styles.miniProgressTrack}>
-          <LinearGradient colors={['#FAFAFB', '#C8C8CD']} style={[styles.miniProgressBar, { width: '72%' }]} />
+          <LinearGradient colors={[Palette.silverTop, Palette.silverBottom]} style={[styles.miniProgressBar, { width: '72%' }]} />
         </View>
       </View>
 
@@ -187,21 +187,21 @@ function InsightsPreview() {
         { title: 'Recurring subscriptions', badge: 5 },
         { title: 'Uncategorized', badge: 8 },
       ].map(item => (
-        <LinearGradient key={item.title} colors={['#1F1F22', '#151517']} style={styles.miniInsightRow}>
+        <LinearGradient key={item.title} colors={[Palette.bgRaisedTop, Palette.bgRaisedBottom]} style={styles.miniInsightRow}>
           <View style={styles.miniInsightIcon}>
-            <View style={styles.miniInsightBadge}><Text style={{ color: '#0A0A0B', fontSize: 6, fontWeight: '700' }}>{item.badge}</Text></View>
+            <View style={styles.miniInsightBadge}><Text style={{ color: Palette.bgBase, fontSize: 6, fontWeight: '700' }}>{item.badge}</Text></View>
           </View>
-          <Text style={{ color: '#F5F5F7', fontSize: 8, flex: 1, fontWeight: '600' }}>{item.title}</Text>
-          <Ionicons name="chevron-forward" size={8} color="#86868C" />
+          <Text style={{ color: Palette.textPrimary, fontSize: 8, flex: 1, fontWeight: '600' }}>{item.title}</Text>
+          <Ionicons name="chevron-forward" size={8} color={Palette.textMuted} />
         </LinearGradient>
       ))}
 
       {/* Floating nav bar */}
       <View style={styles.miniFloatNav}>
-        <View style={[styles.miniNavBtn, { backgroundColor: '#232326' }]} />
-        <LinearGradient colors={['#FAFAFB', '#C8C8CD']} style={styles.miniNavBtn} />
-        <View style={[styles.miniNavBtn, { backgroundColor: '#232326' }]} />
-        <LinearGradient colors={['#FAFAFB', '#C8C8CD']} style={[styles.miniNavBtn, { width: 22, height: 22, borderRadius: 11 }]} />
+        <View style={[styles.miniNavBtn, { backgroundColor: Palette.bgRaisedAlt }]} />
+        <LinearGradient colors={[Palette.silverTop, Palette.silverBottom]} style={styles.miniNavBtn} />
+        <View style={[styles.miniNavBtn, { backgroundColor: Palette.bgRaisedAlt }]} />
+        <LinearGradient colors={[Palette.silverTop, Palette.silverBottom]} style={[styles.miniNavBtn, { width: 22, height: 22, borderRadius: 11 }]} />
       </View>
     </View>
   );
@@ -255,7 +255,7 @@ export const PreviewScreen: React.FC = () => {
             accessibilityLabel="Close preview"
             accessibilityRole="button"
           >
-            <Ionicons name="close" size={20} color="#0A0A0B" />
+            <Ionicons name="close" size={20} color={Palette.bgBase} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Screen Preview</Text>
           <Text style={styles.headerSub}>A · B · C</Text>
@@ -356,7 +356,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: Typography.xl,
     fontWeight: Typography.semibold,
-    color: '#0A0A0B',
+    color: Palette.bgBase,
     letterSpacing: -0.3,
   },
   headerSub: {
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     width: PHONE_W,
     height: PHONE_H,
     borderRadius: 32,
-    backgroundColor: '#0A0A0B',
+    backgroundColor: Palette.bgBase,
     overflow: 'hidden',
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.15)',
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#0A0A0B',
+    backgroundColor: Palette.bgBase,
     alignSelf: 'center',
     position: 'absolute',
     top: 6,
@@ -455,66 +455,66 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
     borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.1)',
   },
-  miniLogoText: { color: '#F5F5F7', fontSize: 8, fontWeight: '700' },
-  miniWordmark: { color: '#F5F5F7', fontSize: 9, fontWeight: '600' },
+  miniLogoText: { color: Palette.textPrimary, fontSize: 8, fontWeight: '700' },
+  miniWordmark: { color: Palette.textPrimary, fontSize: 9, fontWeight: '600' },
   miniBottomContent: {
     paddingHorizontal: 12, paddingBottom: 12, gap: 5, zIndex: 1,
   },
-  miniHeadlineSecondary: { color: '#A1A1A6', fontSize: 18, fontWeight: '600', letterSpacing: -0.5, lineHeight: 22 },
-  miniHeadlineMuted: { color: '#A1A1A6', fontSize: 18, fontWeight: '600', letterSpacing: -0.5, lineHeight: 22 },
-  miniHeadlinePrimary: { color: '#F5F5F7', fontSize: 18, fontWeight: '600', letterSpacing: -0.5, lineHeight: 22 },
-  miniBody: { color: '#A1A1A6', fontSize: 8, lineHeight: 12, marginTop: 4 },
+  miniHeadlineSecondary: { color: Palette.textSecondary, fontSize: 18, fontWeight: '600', letterSpacing: -0.5, lineHeight: 22 },
+  miniHeadlineMuted: { color: Palette.textSecondary, fontSize: 18, fontWeight: '600', letterSpacing: -0.5, lineHeight: 22 },
+  miniHeadlinePrimary: { color: Palette.textPrimary, fontSize: 18, fontWeight: '600', letterSpacing: -0.5, lineHeight: 22 },
+  miniBody: { color: Palette.textSecondary, fontSize: 8, lineHeight: 12, marginTop: 4 },
   miniPrimaryBtn: {
     height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginTop: 6,
   },
-  miniPrimaryBtnText: { color: '#0A0A0B', fontSize: 9, fontWeight: '600' },
+  miniPrimaryBtnText: { color: Palette.bgBase, fontSize: 9, fontWeight: '600' },
 
   miniTopRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8,
   },
   miniMenuBtn: {
     width: 22, height: 22, borderRadius: 11,
-    backgroundColor: '#1F1F22', borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: Palette.bgRaisedTop, borderWidth: 0.5, borderColor: Palette.borderHairline,
     alignItems: 'center', justifyContent: 'center',
   },
-  miniDisplayPrimary: { color: '#F5F5F7', fontSize: 16, fontWeight: '600', letterSpacing: -0.4, lineHeight: 20 },
-  miniDisplaySecondary: { color: '#A1A1A6', fontSize: 16, fontWeight: '600', letterSpacing: -0.4, lineHeight: 20 },
+  miniDisplayPrimary: { color: Palette.textPrimary, fontSize: 16, fontWeight: '600', letterSpacing: -0.4, lineHeight: 20 },
+  miniDisplaySecondary: { color: Palette.textSecondary, fontSize: 16, fontWeight: '600', letterSpacing: -0.4, lineHeight: 20 },
   miniChip: {
     width: 24, height: 20, borderRadius: 10,
-    backgroundColor: '#1F1F22', borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: Palette.bgRaisedTop, borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.1)',
     alignItems: 'center', justifyContent: 'center',
     transform: [{ rotate: '6deg' }],
   },
   miniSearchBar: {
     height: 28, borderRadius: 10,
-    backgroundColor: '#0F0F11', borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: Palette.bgInset, borderWidth: 0.5, borderColor: Palette.borderHairline,
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8,
     marginVertical: 6,
   },
   miniFeaturedPill: {
     height: 36, borderRadius: 18,
-    borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 0.5, borderColor: Palette.borderHairline,
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6, gap: 6,
     marginBottom: 6,
   },
   miniIconTile: { width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center' },
   miniTxnRow: {
     height: 30, borderRadius: 10,
-    borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 0.5, borderColor: Palette.borderHairline,
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6, gap: 6, marginBottom: 4,
   },
-  miniTxnIcon: { width: 18, height: 18, borderRadius: 9, backgroundColor: '#232326' },
+  miniTxnIcon: { width: 18, height: 18, borderRadius: 9, backgroundColor: Palette.bgRaisedAlt },
   miniFloatNav: {
     position: 'absolute', bottom: 8, left: 8, right: 8,
     height: 36, borderRadius: 18,
-    backgroundColor: 'rgba(30,30,33,0.72)',
-    borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)',
+    backgroundColor: Palette.bgGlass,
+    borderWidth: 0.5, borderColor: Palette.borderHairline,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', paddingHorizontal: 6,
   },
   miniNavBtn: { width: 18, height: 18, borderRadius: 9 },
 
   miniHeroCard: {
-    borderRadius: 14, borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 14, borderWidth: 0.5, borderColor: Palette.borderHairline,
     padding: 10, flexDirection: 'row', marginBottom: 6,
   },
   miniIllustration: {
@@ -523,26 +523,26 @@ const styles = StyleSheet.create({
   miniSecPill: {
     height: 18, borderRadius: 9, paddingHorizontal: 8,
     alignItems: 'center', justifyContent: 'center', marginTop: 6, alignSelf: 'flex-start',
-    borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 0.5, borderColor: Palette.borderHairline,
   },
   miniProgressTrack: {
-    height: 8, borderRadius: 4, backgroundColor: '#0F0F11',
-    borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)', overflow: 'hidden',
+    height: 8, borderRadius: 4, backgroundColor: Palette.bgInset,
+    borderWidth: 0.5, borderColor: Palette.borderHairline, overflow: 'hidden',
   },
   miniProgressBar: { height: '100%', borderRadius: 4 },
   miniInsightRow: {
     height: 30, borderRadius: 10,
-    borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)',
+    borderWidth: 0.5, borderColor: Palette.borderHairline,
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 6, gap: 6, marginBottom: 4,
   },
   miniInsightIcon: {
-    width: 18, height: 18, borderRadius: 9, backgroundColor: '#0A0A0B',
-    borderWidth: 0.5, borderColor: 'rgba(255,255,255,0.08)',
+    width: 18, height: 18, borderRadius: 9, backgroundColor: Palette.bgBase,
+    borderWidth: 0.5, borderColor: Palette.borderHairline,
     alignItems: 'center', justifyContent: 'center', position: 'relative',
   },
   miniInsightBadge: {
     position: 'absolute', top: -3, right: -3,
     width: 9, height: 9, borderRadius: 4.5,
-    backgroundColor: '#F5F5F7', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: Palette.textPrimary, alignItems: 'center', justifyContent: 'center',
   },
 });

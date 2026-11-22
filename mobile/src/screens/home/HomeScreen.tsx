@@ -8,7 +8,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Palette, Colors, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
 import { AppLogo } from '../../components/ui/AppLogo';
 import { GlossyChip } from '../../components/ui/GlossyChip';
 import { SearchBar } from '../../components/ui/SearchBar';
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
   menuCard: {
     width: 270,
     maxHeight: '82%',
-    backgroundColor: '#1E1E22',
+    backgroundColor: Palette.bgRaisedTop,
     borderRadius: Radius['2xl'],
     borderWidth: 1,
     borderColor: Colors.borderAlt,

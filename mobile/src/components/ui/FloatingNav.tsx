@@ -8,7 +8,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Radius } from '../../constants/theme';
+import { Palette, Radius } from '../../constants/theme';
 
 export type NavTab = 'home' | 'insights' | 'accounts';
 
@@ -66,16 +66,16 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
               >
                 {isActive ? (
                   <LinearGradient
-                    colors={['#FAFAFB', '#C8C8CD']}
+                    colors={[Palette.silverTop, Palette.silverBottom]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 0, y: 1 }}
                     style={styles.navBtn}
                   >
-                    <Ionicons name={item.iconActive} size={22} color="#0A0A0B" />
+                    <Ionicons name={item.iconActive} size={22} color={Palette.bgBase} />
                   </LinearGradient>
                 ) : (
                   <View style={[styles.navBtn, styles.navBtnInactive]}>
-                    <Ionicons name={item.icon} size={22} color="#A1A1A6" />
+                    <Ionicons name={item.icon} size={22} color={Palette.textSecondary} />
                   </View>
                 )}
               </TouchableOpacity>
@@ -94,12 +94,12 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
         style={styles.addBtnWrapper}
       >
         <LinearGradient
-          colors={['#FAFAFB', '#C8C8CD']}
+          colors={[Palette.silverTop, Palette.silverBottom]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.addBtn}
         >
-          <Ionicons name="add" size={28} color="#0A0A0B" />
+          <Ionicons name="add" size={28} color={Palette.bgBase} />
         </LinearGradient>
       </TouchableOpacity>
     </View>
@@ -131,10 +131,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
-    backgroundColor: 'rgba(30, 30, 33, 0.72)',
+    backgroundColor: Palette.bgGlass,
     borderRadius: Radius.full,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: Palette.borderHairline,
     paddingHorizontal: 8,
     paddingVertical: 7,
     overflow: 'hidden',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: Palette.highlightTop,
   },
   navBtnWrapper: {
     width: 44,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   navBtnInactive: {
-    backgroundColor: '#232326',
+    backgroundColor: Palette.bgRaisedAlt,
   },
   addBtnWrapper: {
     width: 52,
@@ -187,6 +187,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.12)',
+    borderColor: Palette.highlightTop,
   },
 });

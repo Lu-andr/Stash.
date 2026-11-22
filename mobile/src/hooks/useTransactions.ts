@@ -1,3 +1,4 @@
+import { Palette } from '../constants/theme';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { api } from '../services/api';
 import { API_ENDPOINTS } from '../constants/api';
@@ -18,7 +19,7 @@ const fallbackMockList: Transaction[] = MOCK_TRANSACTIONS.map(m => ({
   user_id: 'user-1',
   amount: m.amount,
   type: m.type,
-  category: { id: 'cat-1', name: m.category, icon: m.iconName, color: '#FAFAFB', type: m.type, is_default: true },
+  category: { id: 'cat-1', name: m.category, icon: m.iconName, color: Palette.silverTop, type: m.type, is_default: true },
   date: m.date,
   description: `${m.category} · ${m.method}`,
   title: m.merchant,

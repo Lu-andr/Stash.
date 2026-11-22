@@ -1,0 +1,48 @@
+name: Android test APK
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/android-test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v3
+      - run: npm ci --no-audit --no-fund
+        working-directory: mobile
+      - run: npx tsc --noEmit
+        working-directory: mobile
+      - run: npx expo prebuild --platform android --no-install
+        working-directory: mobile
+        env:
+          CI: '1'
+      - run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a --max-workers=2 --console=plain
+        working-directory: mobile/android
+        env:
+          NODE_ENV: production
+      - run: cp mobile/android/app/build/outputs/apk/release/app-release.apk Stash-navy-1.0.0-test-arm64.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Stash-navy-test-arm64
+          path: Stash-navy-1.0.0-test-arm64.apk
+          if-no-files-found: error
+          retention-days: 30

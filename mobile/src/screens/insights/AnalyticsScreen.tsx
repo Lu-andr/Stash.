@@ -11,7 +11,7 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Rect, Line, Text as SvgText } from 'react-native-svg';
 
-import {
+import { Palette,
   Colors, Gradients, Typography, Spacing, Radius, Shadow,
 } from '../../constants/theme';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
@@ -303,7 +303,7 @@ export const AnalyticsScreen: React.FC = () => {
                   <React.Fragment key={m.label}>
                     <Rect x={x + 1} y={y + 2} width={barWidth - 2} height={bh} rx={barWidth / 3} fill="rgba(0,0,0,0.3)" />
                     <Rect x={x} y={y} width={barWidth} height={bh} rx={barWidth / 3}
-                      fill={isSel ? '#FAFAFB' : '#2E2E33'} onPress={() => setSelectedMonth(m.label)} />
+                      fill={isSel ? Palette.silverTop : Palette.chartMuted} onPress={() => setSelectedMonth(m.label)} />
                     <Rect x={x} y={y} width={barWidth} height={Math.min(3, bh)} rx={1}
                       fill={isSel ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.10)'} />
                     <SvgText x={x + barWidth / 2} y={BAR_H + 18} textAnchor="middle"
@@ -350,10 +350,10 @@ export const AnalyticsScreen: React.FC = () => {
               </View>
               <View style={styles.catList}>
                 {[
-                  { name: 'Salary',       amount: 75000, iconName: 'briefcase-outline',        color: '#FAFAFB', pct: 88 },
-                  { name: 'Freelance',    amount: 8000,  iconName: 'laptop-outline',            color: '#A0A0A5', pct: 9  },
-                  { name: 'Investments',  amount: 2000,  iconName: 'trending-up-outline',       color: '#6A6A6F', pct: 2  },
-                  { name: 'Other',        amount: 0,     iconName: 'ellipsis-horizontal-outline', color: '#3A3A3E', pct: 0 },
+                  { name: 'Salary',       amount: 75000, iconName: 'briefcase-outline',        color: Palette.silverTop, pct: 88 },
+                  { name: 'Freelance',    amount: 8000,  iconName: 'laptop-outline',            color: Palette.chartSoft, pct: 9  },
+                  { name: 'Investments',  amount: 2000,  iconName: 'trending-up-outline',       color: Palette.chartMid, pct: 2  },
+                  { name: 'Other',        amount: 0,     iconName: 'ellipsis-horizontal-outline', color: Palette.chartMuted, pct: 0 },
                 ].map((src, i) => (
                   <CategoryRow
                     key={src.name}
@@ -388,9 +388,9 @@ export const AnalyticsScreen: React.FC = () => {
                 return (
                   <React.Fragment key={d.day}>
                     <Rect x={x} y={y} width={weekBarW} height={bh} rx={weekBarW / 3}
-                      fill={isToday ? '#FAFAFB' : '#2A2A2E'} />
+                      fill={isToday ? Palette.silverTop : Palette.bgRaisedAlt} />
                     <Rect x={x} y={y} width={weekBarW} height={Math.min(2, bh)} rx={1}
-                      fill={isToday ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.08)'} />
+                      fill={isToday ? 'rgba(255,255,255,0.6)' : Palette.borderHairline} />
                     <SvgText x={x + weekBarW / 2} y={WEEK_H + 16} textAnchor="middle"
                       fontSize={9} fontWeight="500" fill={isToday ? Colors.text : Colors.textMuted}>
                       {d.day}

@@ -1,36 +1,44 @@
-// ─── Foundry Premium Monochrome Design Tokens ────────────────────────────────
+// ─── Stash Deep Navy Design Tokens ────────────────────────────────
 // Single source of truth. No raw hex values inside components.
 
 // ── Raw palette ──────────────────────────────────────────────────────────────
 export const Palette = {
   // Canvas / surfaces
-  bgBase:          '#0A0A0B',
-  bgInset:         '#0F0F11',
-  bgRaisedTop:     '#1F1F22',
-  bgRaisedBottom:  '#151517',
-  bgGlass:         'rgba(30,30,33,0.72)',
-  bgRaisedAlt:     '#232326', // inactive nav button
+  bgBase:          '#071426',
+  bgInset:         '#0B1C33',
+  bgRaisedTop:     '#152F50',
+  bgRaisedBottom:  '#0D213B',
+  bgGlass:         'rgba(13,33,59,0.92)',
+  bgRaisedAlt:     '#1A385C', // inactive nav button
+
+  // Raised details and charts
+  surfaceHigh:     '#21436B',
+  detailTop:       '#204267',
+  detailBottom:    '#102842',
+  chartMuted:      '#315B85',
+  chartMid:        '#4A7FAD',
+  chartSoft:       '#7AADD6',
 
   // Borders / highlights
-  borderHairline:  'rgba(255,255,255,0.08)',
-  highlightTop:    'rgba(255,255,255,0.12)', // inset 0 1px 0 — used as borderTop tint
+  borderHairline:  'rgba(147,197,253,0.14)',
+  highlightTop:    'rgba(186,220,255,0.18)', // inset 0 1px 0 — used as borderTop tint
   shadowLift:      'rgba(0,0,0,0.55)',
 
   // Text
-  textPrimary:     '#F5F5F7',
-  textSecondary:   '#A1A1A6',
-  textMuted:       '#86868C',
+  textPrimary:     '#EFF6FF',
+  textSecondary:   '#B7CAE4',
+  textMuted:       '#98B0D0',
 
-  // Silver (CTA / active state)
-  silverTop:       '#FAFAFB',
-  silverBottom:    '#C8C8CD',
-  onSilver:        '#0A0A0B',
+  // Ice blue (CTA / active state); silver names retained for compatibility
+  silverTop:       '#A9D6FF',
+  silverBottom:    '#63ACF2',
+  onSilver:        '#071426',
 
   // Hero fade stops (for LinearGradient)
-  heroFade0:       '#DADADD',
-  heroFade1:       '#8A8A8F',
-  heroFade2:       '#1C1C1E',
-  heroFade3:       '#0A0A0B',
+  heroFade0:       '#214B7B',
+  heroFade1:       '#16375E',
+  heroFade2:       '#0C223E',
+  heroFade3:       '#071426',
 
   // Semantic / financial
   income:          '#7CE0A6',
@@ -41,7 +49,7 @@ export const Palette = {
   dangerAlpha:     'rgba(255,122,114,0.14)',
 
   // Grid overlay
-  gridLine:        'rgba(255,255,255,0.04)',
+  gridLine:        'rgba(147,197,253,0.06)',
 } as const;
 
 // ── Semantic aliases (what components should import) ─────────────────────────
@@ -51,7 +59,7 @@ export const Colors = {
   secondaryBg:   Palette.bgInset,
   surface:       Palette.bgRaisedTop,    // compat alias → top of raised gradient
   surfaceAlt:    Palette.bgRaisedAlt,
-  surfaceHigh:   '#28282C',
+  surfaceHigh:   Palette.surfaceHigh,
   surfaceInput:  Palette.bgInset,
   bgBase:        Palette.bgBase,
   bgInset:       Palette.bgInset,
@@ -59,13 +67,13 @@ export const Colors = {
 
   // Borders / highlights
   border:        Palette.borderHairline,
-  borderAlt:     'rgba(255,255,255,0.12)',
+  borderAlt:     'rgba(186,220,255,0.18)',
   highlightTop:  Palette.highlightTop,
 
-  // Primary accent — Foundry silver monochrome
+  // Primary accent — ice blue on deep navy
   primary:       Palette.silverTop,
   primaryDark:   Palette.silverBottom,
-  primaryLight:  'rgba(250, 250, 251, 0.12)',
+  primaryLight:  'rgba(99,172,242,0.16)',
 
   // Silver (used in new premium components via Gradients.silver directly)
   silverTop:     Palette.silverTop,
@@ -106,7 +114,7 @@ export const Colors = {
   darkBorder:    Palette.borderHairline,
   darkText:      Palette.textPrimary,
   darkTextSecondary: Palette.textSecondary,
-  primaryOverlay: 'rgba(250,250,251,0.10)',
+  primaryOverlay: 'rgba(99,172,242,0.12)',
   errorLight2:   Palette.dangerAlpha,
   successLight2: Palette.incomeAlpha,
   warningLight2: Palette.warningAlpha,

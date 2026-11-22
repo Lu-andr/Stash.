@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Palette, Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
 
 interface InsightRowProps {
   title: string;
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#0A0A0B', // near-black tile per spec
+    backgroundColor: Palette.bgBase, // near-black tile per spec
     borderWidth: 1,
     borderColor: Colors.border,
     alignItems: 'center',

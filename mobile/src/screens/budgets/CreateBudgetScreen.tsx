@@ -6,7 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
 import { api } from '../../services/api';
 import { API_ENDPOINTS } from '../../constants/api';
 import { Category } from '../../types';
@@ -34,12 +34,12 @@ export const CreateBudgetScreen: React.FC = () => {
   const [isRecurring, setIsRecurring] = useState(true);
 
   const DEFAULT_CATEGORIES: Category[] = [
-    { id: 'cat-1', name: 'Food & Dining', icon: 'fast-food-outline', color: '#FAFAFB', type: 'expense', is_default: true },
-    { id: 'cat-2', name: 'Transport', icon: 'car-outline', color: '#FAFAFB', type: 'expense', is_default: true },
-    { id: 'cat-3', name: 'Shopping', icon: 'bag-handle-outline', color: '#FAFAFB', type: 'expense', is_default: true },
-    { id: 'cat-4', name: 'Entertainment', icon: 'tv-outline', color: '#FAFAFB', type: 'expense', is_default: true },
-    { id: 'cat-5', name: 'Bills & Utilities', icon: 'receipt-outline', color: '#FAFAFB', type: 'expense', is_default: true },
-    { id: 'cat-6', name: 'Health', icon: 'medkit-outline', color: '#FAFAFB', type: 'expense', is_default: true },
+    { id: 'cat-1', name: 'Food & Dining', icon: 'fast-food-outline', color: Palette.silverTop, type: 'expense', is_default: true },
+    { id: 'cat-2', name: 'Transport', icon: 'car-outline', color: Palette.silverTop, type: 'expense', is_default: true },
+    { id: 'cat-3', name: 'Shopping', icon: 'bag-handle-outline', color: Palette.silverTop, type: 'expense', is_default: true },
+    { id: 'cat-4', name: 'Entertainment', icon: 'tv-outline', color: Palette.silverTop, type: 'expense', is_default: true },
+    { id: 'cat-5', name: 'Bills & Utilities', icon: 'receipt-outline', color: Palette.silverTop, type: 'expense', is_default: true },
+    { id: 'cat-6', name: 'Health', icon: 'medkit-outline', color: Palette.silverTop, type: 'expense', is_default: true },
   ];
 
   useEffect(() => {
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FAFAFB',
+    backgroundColor: Palette.silverTop,
     borderRadius: Radius.full,
     paddingVertical: Spacing.base,
     gap: Spacing.sm,
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   createBtnText: {
-    color: '#0A0A0B',
+    color: Palette.bgBase,
     fontSize: Typography.base,
     fontWeight: Typography.bold,
   },
