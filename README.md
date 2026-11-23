@@ -8,7 +8,7 @@ Use Node 22 and Java 21. In mobile:
 - npm run check:local
 - npx tsc --noEmit
 - npx expo prebuild --platform android --no-install
-- cd android && ./gradlew testReleaseUnitTest assembleRelease -PreactNativeArchitectures=arm64-v8a
+- cd android && ./gradlew :app:testReleaseUnitTest :app:assembleRelease -PreactNativeArchitectures=arm64-v8a
 
 The release is standalone; it does not use a development server. Android Internet permissions are enabled for Remote Config and offer pages; automatic backup remains disabled. The iOS AsyncStorage backup exclusion is explicitly enabled.
 

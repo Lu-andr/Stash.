@@ -43,7 +43,7 @@ jobs:
         working-directory: mobile
         env:
           CI: '1'
-      - run: ./gradlew testReleaseUnitTest assembleRelease -PreactNativeArchitectures=arm64-v8a --max-workers=2 --console=plain
+      - run: ./gradlew :app:testReleaseUnitTest :app:assembleRelease -PreactNativeArchitectures=arm64-v8a --max-workers=2 --console=plain
         working-directory: mobile/android
         env:
           NODE_ENV: production
