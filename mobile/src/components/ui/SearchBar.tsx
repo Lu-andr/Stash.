@@ -3,7 +3,8 @@ import {
   View, TextInput, TouchableOpacity, StyleSheet,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Spacing, Radius, Typography } from '../../constants/theme';
+import { Spacing, Radius, Typography, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 interface SearchBarProps {
   value?: string;
@@ -18,6 +19,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onFilterPress,
   placeholder = 'Search transactions',
 }) => {
+  const { Colors } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   return (
     <View style={styles.container}>
       {/* Leading search icon */}
@@ -53,7 +57,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   container: {
     height: 52,
     borderRadius: 20,

@@ -7,7 +7,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { localStore } from '../../data/repository';
 import { useLocalState } from '../../context/LocalDataContext';
 import { transactionView } from '../../data/domain';
@@ -18,6 +19,9 @@ type Route = RouteProp<RootStackParamList, 'TransactionDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export const TransactionDetailScreen: React.FC = () => {
+  const { Colors, Palette, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const route = useRoute<Route>();
   const navigation = useNavigation<Nav>();
   const state = useLocalState();
@@ -64,7 +68,7 @@ export const TransactionDetailScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} backgroundColor={Colors.background} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -84,18 +88,18 @@ export const TransactionDetailScreen: React.FC = () => {
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Amount Hero */}
         <View style={styles.heroCard}>
-          <View style={[styles.categoryBadge, { backgroundColor: isIncome ? 'rgba(124,224,166,0.15)' : Palette.borderHairline }]}>
+          <View style={[styles.categoryBadge, { backgroundColor: isIncome ? Colors.incomeLight : Palette.borderHairline }]}>
             <Ionicons
               name={(transaction.category?.icon || 'receipt-outline') as any}
               size={32}
               color={isIncome ? Colors.income : Colors.text}
             />
           </View>
-          <Text style={[styles.amount, { color: isIncome ? Colors.income : '#FFFFFF' }]}>
+          <Text style={[styles.amount, { color: isIncome ? Colors.income : Colors.text }]}>
             {isIncome ? '+' : '-'}{formatCurrency(transaction.amount, transaction.currency)}
           </Text>
           <Text style={styles.categoryName}>{transaction.category?.name || 'Uncategorized'}</Text>
-          <View style={[styles.typeBadge, { backgroundColor: isIncome ? 'rgba(48,209,88,0.15)' : 'rgba(255,69,58,0.15)' }]}>
+          <View style={[styles.typeBadge, { backgroundColor: isIncome ? Colors.incomeLight : Colors.expenseLight }]}>
             <Text style={[styles.typeBadgeText, { color: isIncome ? Colors.income : Colors.expense }]}>
               {isIncome ? 'INCOME' : 'EXPENSE'}
             </Text>
@@ -130,7 +134,10 @@ export const TransactionDetailScreen: React.FC = () => {
   );
 };
 
-const DetailRow = ({ icon, label, value, isLast }: { icon: any; label: string; value: string; isLast?: boolean }) => (
+const DetailRow = ({ icon, label, value, isLast }: { icon: any; label: string; value: string; isLast?: boolean }) => {
+  const { Colors } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+  return (
   <View style={[styles.detailRow, isLast && { borderBottomWidth: 0 }]}>
     <View style={styles.detailIcon}>
       <Ionicons name={icon} size={16} color={Colors.textSecondary} />
@@ -141,8 +148,9 @@ const DetailRow = ({ icon, label, value, isLast }: { icon: any; label: string; v
     </View>
   </View>
 );
+};
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Palette }: AppTheme) => StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: Colors.bgBase,
@@ -269,12 +277,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: Spacing.sm,
-    backgroundColor: 'rgba(255, 69, 58, 0.1)',
+    backgroundColor: Colors.dangerLight,
     borderRadius: Radius.full,
     paddingVertical: Spacing.base,
     borderWidth: 1,
-    borderColor: 'rgba(255, 69, 58, 0.25)',
-  },
+    borderColor: Colors.dangerLight },
   deleteBtnText: {
     fontSize: Typography.base,
     fontWeight: Typography.bold,

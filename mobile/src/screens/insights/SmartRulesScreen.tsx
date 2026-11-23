@@ -9,9 +9,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import {
-  Colors, Gradients, Typography, Spacing, Radius, Shadow,
-} from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { localStore } from '../../data/repository';
 import { useLocalState } from '../../context/LocalDataContext';
 import { newId, type LocalRule } from '../../data/domain';
@@ -22,6 +21,9 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 type SmartRule = LocalRule;
 
 export const SmartRulesScreen: React.FC = () => {
+  const { Colors, Gradients, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation<Nav>();
   const state = useLocalState();
   const rules = state.rules;
@@ -75,7 +77,7 @@ export const SmartRulesScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.bgBase} />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} backgroundColor={Colors.bgBase} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -315,7 +317,7 @@ export const SmartRulesScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: Colors.bgBase,
@@ -527,7 +529,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: Typography.extrabold,
     color: Colors.income,
-    backgroundColor: 'rgba(124,224,166,0.12)',
+    backgroundColor: Colors.incomeLight,
     paddingHorizontal: 5,
     paddingVertical: 1,
     borderRadius: 4,

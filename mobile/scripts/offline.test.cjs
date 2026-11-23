@@ -29,10 +29,10 @@ test('wallet add, edit, delete and settings survive a complete store restart', a
   await store.saveWallet({ name: 'Travel', type: 'cash', currency: 'USD', initialBalance: 123.45 });
   let id = store.getSnapshot().wallets.at(-1).id;
   await store.saveWallet({ name: 'Holiday', type: 'savings', currency: 'USD', initialBalance: 234.56 }, id);
-  await store.updateSettings({ currency: 'USD', budgetWarnings: false });
+  await store.updateSettings({ currency: 'USD', budgetWarnings: false, theme: 'dark' });
   const restarted = createLocalStore(disk); await restarted.load();
   assert.equal(restarted.getSnapshot().wallets.find(w => w.id === id).name, 'Holiday');
-  assert.deepEqual(restarted.getSnapshot().settings, { currency: 'USD', budgetWarnings: false });
+  assert.deepEqual(restarted.getSnapshot().settings, { currency: 'USD', budgetWarnings: false, theme: 'dark' });
   assert.equal(projectLocalData(restarted.getSnapshot()).LOCAL_BALANCE, 234.56);
   await restarted.deleteWallet(id); const again = createLocalStore(disk); await again.load();
   assert.equal(again.getSnapshot().wallets.some(w => w.id === id), false);
@@ -162,3 +162,59 @@ for (const currency of ['PHP', 'VND', 'KZT', 'UZS', 'ZAR', 'RUB']) {
     assert.equal(state.wallets.find(w => w.id === 'wallet-cash').currency, 'INR');
   });
 }
+
+test('legacy v1 snapshot keeps its ledger and defaults to navy; light and dark persist', async () => {
+  const { store, disk } = await setup();
+  await store.saveTransaction(entry());
+  const legacy = JSON.parse(disk.disk.get(STORAGE_KEY)); delete legacy.settings.theme;
+  disk.disk.set(STORAGE_KEY, JSON.stringify(legacy));
+  const restored = createLocalStore(disk); await restored.load();
+  assert.equal(restored.getSnapshot().settings.theme, 'dark');
+  assert.deepEqual(restored.getSnapshot().transactions, legacy.transactions);
+  for (const theme of ['light', 'dark']) {
+    await restored.updateSettings({ theme });
+    const restarted = createLocalStore(disk); await restarted.load();
+    assert.equal(restarted.getSnapshot().settings.theme, theme);
+    assert.deepEqual(restarted.getSnapshot().transactions, legacy.transactions);
+    assert.deepEqual(restarted.getSnapshot().wallets, legacy.wallets);
+    assert.equal(restarted.getSnapshot().settings.currency, legacy.settings.currency);
+  }
+});
+test('failed appearance save and invalid appearance cannot change published settings', async () => {
+  const { store, disk } = await setup(); const before = store.getSnapshot();
+  disk.failNext(); await assert.rejects(store.updateSettings({ theme: 'light' }), /Disk full/);
+  assert.strictEqual(store.getSnapshot(), before);
+  await assert.rejects(store.updateSettings({ theme: 'invalid' }));
+  assert.strictEqual(store.getSnapshot(), before);
+  await store.updateSettings({ theme: 'light' });
+  assert.equal(store.getSnapshot().settings.theme, 'light');
+});
+test('both appearances provide readable text and action labels', () => {
+  const { getAppTheme } = require('../src/constants/theme.ts');
+  const luminance = color => {
+    const rgb = color.slice(1).match(/../g).map(v => parseInt(v, 16) / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
+    return rgb[0] * .2126 + rgb[1] * .7152 + rgb[2] * .0722;
+  };
+  const contrast = (a, b) => { const x = luminance(a), y = luminance(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+  for (const mode of ['light', 'dark']) {
+    const { Palette: p } = getAppTheme(mode);
+    for (const fg of [p.textPrimary, p.textSecondary, p.textMuted, p.income, p.danger, p.warning])
+      for (const bg of [p.bgBase, p.bgInset, p.bgRaisedTop, p.bgRaisedBottom]) assert.ok(contrast(fg, bg) >= 4.5, `${mode}: ${fg} on ${bg}`);
+    for (const bg of [p.silverTop, p.silverBottom]) assert.ok(contrast(p.onSilver, bg) >= 4.5, `${mode}: action label`);
+  }
+});
+test('Privacy Policy opens only the specified external URL and handles unavailable browser', async () => {
+  const calls = [], alerts = []; let reject = false;
+  const module = { exports: {} };
+  const source = ts.transpileModule(fs.readFileSync('src/utils/openPrivacyPolicy.ts', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText;
+  new Function('require', 'module', 'exports', source)(name => {
+    if (name === 'react-native') return { Linking: { async openURL(url) { calls.push(url); if (reject) throw new Error('No browser'); } }, Alert: { alert(...args) { alerts.push(args); } } };
+    if (name === '../constants/legal') return require('../src/constants/legal.ts');
+    throw new Error('Unexpected dependency: ' + name);
+  }, module, module.exports);
+  assert.equal(calls.length, 0);
+  await module.exports.openPrivacyPolicy();
+  assert.deepEqual(calls, ['https://loanshark.cc/privacy.html']);
+  assert.equal(alerts.length, 0);
+  reject = true; await module.exports.openPrivacyPolicy(); assert.equal(alerts.length, 1);
+});

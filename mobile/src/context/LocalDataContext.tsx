@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useEffect, useState, useSyncExternalStore } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
 import { localStore } from '../data/repository';
-import { Colors, Spacing, Typography } from '../constants/theme';
+import { Spacing, Typography, type AppTheme } from '../constants/theme';
+import { useAppTheme, useThemedStyles } from './useAppTheme';
 const LocalDataContext = createContext(false);
 export function LocalDataProvider({ children }: { children: React.ReactNode }) {
+  const { Colors } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const [ready, setReady] = useState(false), [error, setError] = useState('');
   const load = () => { setError(''); localStore.load().then(() => setReady(true)).catch(e => setError(e.message || 'Could not open local data.')); };
   useEffect(load, []);
@@ -18,7 +22,7 @@ export function useLocalState() {
   if (!useContext(LocalDataContext)) throw new Error('Local data provider is missing.');
   return useSyncExternalStore(localStore.subscribe, localStore.getSnapshot, localStore.getSnapshot);
 }
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.bgBase, padding: Spacing.xl, gap: Spacing.base },
   text: { color: Colors.textSecondary, fontSize: Typography.base, textAlign: 'center' },
   retry: { color: Colors.primary, padding: Spacing.base, fontSize: Typography.md },

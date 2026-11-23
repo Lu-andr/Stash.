@@ -18,6 +18,8 @@ export function createLocalStore(storage: DeviceStorage) {
     initialization = (async () => {
       const raw = await storage.getItem(STORAGE_KEY);
       const candidate = raw === null ? initialState() : JSON.parse(raw);
+      // Older v1 snapshots predate appearance preferences. Keep all existing records.
+      if (candidate?.version === 1 && candidate.settings && !Object.prototype.hasOwnProperty.call(candidate.settings, 'theme')) candidate.settings.theme = 'dark';
       validateState(candidate);
       if (raw === null) await storage.setItem(STORAGE_KEY, JSON.stringify(candidate));
       state = freeze(candidate); ready = true; emit();

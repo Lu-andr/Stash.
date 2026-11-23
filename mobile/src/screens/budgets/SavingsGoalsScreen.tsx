@@ -7,7 +7,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { localStore } from '../../data/repository';
 import { CURRENCIES, newId, periodEnd } from '../../data/domain';
 import { useLocalData, GoalItem, formatMoney } from '../../data/localData';
@@ -24,6 +25,9 @@ const GOAL_ICON_OPTIONS: Array<{ icon: keyof typeof Ionicons.glyphMap; label: st
 ];
 
 export const SavingsGoalsScreen: React.FC = () => {
+  const { Colors, Gradients, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation();
   const { LOCAL_SAVINGS_GOALS: goals, state } = useLocalData();
   const currencySymbol = CURRENCIES.find(c => c.value === state.settings.currency)?.symbol ?? state.settings.currency;
@@ -68,7 +72,7 @@ export const SavingsGoalsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.bgBase} />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} backgroundColor={Colors.bgBase} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -274,7 +278,7 @@ export const SavingsGoalsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.bgBase },
   header: {
     flexDirection: 'row',

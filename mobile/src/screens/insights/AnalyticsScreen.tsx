@@ -11,9 +11,8 @@ import { RootStackParamList } from '../../navigation/AppNavigator';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Rect, Line, Text as SvgText } from 'react-native-svg';
 
-import { Palette,
-  Colors, Gradients, Typography, Spacing, Radius, Shadow,
-} from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
 import { useLocalData, formatMoney } from '../../data/localData';
 
@@ -29,7 +28,10 @@ type ViewMode = 'expense' | 'income';
 // -- Mini stat card ----------------------------------------------------------
 const StatCard = ({ label, value, valueColor, icon }: {
   label: string; value: string; valueColor?: string; icon: string;
-}) => (
+}) => {
+  const { Colors, Gradients } = useAppTheme();
+  const stat = useThemedStyles(createStat);
+  return (
   <LinearGradient colors={Gradients.raised} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={stat.card}>
     <View style={stat.topLine} />
     <View style={stat.iconWrap}>
@@ -41,8 +43,9 @@ const StatCard = ({ label, value, valueColor, icon }: {
     <Text style={stat.label}>{label}</Text>
   </LinearGradient>
 );
+};
 
-const stat = StyleSheet.create({
+const createStat = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   card: {
     flex: 1, borderRadius: Radius.xl, borderWidth: 1, borderColor: Colors.border,
     padding: Spacing.md, overflow: 'hidden', gap: 4,
@@ -71,6 +74,9 @@ const CategoryRow = ({
   name: string; amount: number; total: number;
   iconName: string; barColor: string; index: number;
 }) => {
+  const { Colors } = useAppTheme();
+  const catRow = useThemedStyles(createCatRow);
+
   const pct = total > 0 ? (amount / total) * 100 : 0;
   const barAnim = useRef(new Animated.Value(0)).current;
 
@@ -108,7 +114,7 @@ const CategoryRow = ({
   );
 };
 
-const catRow = StyleSheet.create({
+const createCatRow = ({ Colors }: AppTheme) => StyleSheet.create({
   wrap: {
     flexDirection: 'row', alignItems: 'center',
     justifyContent: 'space-between', gap: Spacing.md,
@@ -136,6 +142,9 @@ const catRow = StyleSheet.create({
 
 // -- Main Screen -------------------------------------------------------------
 export const AnalyticsScreen: React.FC = () => {
+  const { Colors, Palette, Gradients, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation<Nav>();
   const { LOCAL_ANALYTICS_MONTHS, LOCAL_ANALYTICS_CURRENT_MONTH, LOCAL_CATEGORY_BREAKDOWN, LOCAL_INCOME_BREAKDOWN, LOCAL_WEEKLY_TREND, state } = useLocalData();
   const [activeTab] = useState<NavTab>('insights');
@@ -181,7 +190,7 @@ export const AnalyticsScreen: React.FC = () => {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} />
       <SafeAreaView style={styles.safe} edges={['top']}>
 
         {/* -- Header -- */}
@@ -287,7 +296,7 @@ export const AnalyticsScreen: React.FC = () => {
             <Svg width={CHART_W} height={BAR_H + 24} style={{ marginTop: Spacing.base }}>
               {[0.33, 0.66, 1].map(r => (
                 <Line key={r} x1={0} y1={BAR_H * (1 - r)} x2={CHART_W} y2={BAR_H * (1 - r)}
-                  stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
+                  stroke={Palette.gridLine} strokeWidth={1} />
               ))}
               {LOCAL_ANALYTICS_MONTHS.map((m, i) => {
                 const val = viewMode === 'expense' ? m.amount : m.income;
@@ -301,7 +310,7 @@ export const AnalyticsScreen: React.FC = () => {
                     <Rect x={x} y={y} width={barWidth} height={bh} rx={barWidth / 3}
                       fill={isSel ? Palette.silverTop : Palette.chartMuted} onPress={() => setSelectedMonth(m.label)} />
                     <Rect x={x} y={y} width={barWidth} height={Math.min(3, bh)} rx={1}
-                      fill={isSel ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.10)'} />
+                      fill={isSel ? Palette.onSilver : Palette.highlightTop} />
                     <SvgText x={x + barWidth / 2} y={BAR_H + 18} textAnchor="middle"
                       fontSize={10} fontWeight="600" fill={isSel ? Colors.text : Colors.textMuted}>
                       {m.label}
@@ -381,7 +390,7 @@ export const AnalyticsScreen: React.FC = () => {
                     <Rect x={x} y={y} width={weekBarW} height={bh} rx={weekBarW / 3}
                       fill={isToday ? Palette.silverTop : Palette.bgRaisedAlt} />
                     <Rect x={x} y={y} width={weekBarW} height={Math.min(2, bh)} rx={1}
-                      fill={isToday ? 'rgba(255,255,255,0.6)' : Palette.borderHairline} />
+                      fill={isToday ? Palette.onSilver : Palette.borderHairline} />
                     <SvgText x={x + weekBarW / 2} y={WEEK_H + 16} textAnchor="middle"
                       fontSize={9} fontWeight="500" fill={isToday ? Colors.text : Colors.textMuted}>
                       {d.day}
@@ -486,7 +495,7 @@ export const AnalyticsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.bgBase },
   safe: { flex: 1 },
   scroll: { flex: 1 },
@@ -588,8 +597,7 @@ const styles = StyleSheet.create({
   savingsRateBadge: {
     backgroundColor: Colors.incomeLight, borderRadius: Radius.full,
     paddingHorizontal: Spacing.md, paddingVertical: 6,
-    borderWidth: 1, borderColor: 'rgba(124,224,166,0.25)',
-  },
+    borderWidth: 1, borderColor: Colors.incomeLight },
   savingsRateVal: { fontSize: Typography.md, fontWeight: Typography.bold, color: Colors.income },
 
   monthPillsRow: {

@@ -4,7 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import Svg, {
   Rect, Circle, Line, Path, Polygon, Defs, LinearGradient as SvgLinearGradient, Stop,
 } from 'react-native-svg';
-import { Palette, Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { SecondaryPill } from './SecondaryPill';
 
 interface HeroInfoCardProps {
@@ -16,18 +17,20 @@ interface HeroInfoCardProps {
 
 // Monochrome SVG illustration — coin stack + rising chart on easel, slightly tilted
 function MonochromeIllustration() {
+  const { Colors, Palette } = useAppTheme();
+
   return (
     <View style={{ transform: [{ rotate: '-6deg' }] }}>
       <Svg width={88} height={88} viewBox="0 0 88 88" fill="none">
         {/* Easel panel — dark card */}
-        <Rect x="12" y="8" width="64" height="52" rx="8" fill={Palette.bgRaisedTop} stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
+        <Rect x="12" y="8" width="64" height="52" rx="8" fill={Palette.bgRaisedTop} stroke={Colors.border} strokeWidth="1" />
         {/* Inner panel highlight */}
-        <Rect x="12" y="8" width="64" height="1" rx="0.5" fill="rgba(255,255,255,0.15)" />
+        <Rect x="12" y="8" width="64" height="1" rx="0.5" fill={Colors.highlightTop} />
 
         {/* Chart grid lines — very subtle */}
-        <Line x1="18" y1="46" x2="70" y2="46" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-        <Line x1="18" y1="38" x2="70" y2="38" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
-        <Line x1="18" y1="30" x2="70" y2="30" stroke="rgba(255,255,255,0.06)" strokeWidth="1" />
+        <Line x1="18" y1="46" x2="70" y2="46" stroke={Colors.gridLine} strokeWidth="1" />
+        <Line x1="18" y1="38" x2="70" y2="38" stroke={Colors.gridLine} strokeWidth="1" />
+        <Line x1="18" y1="30" x2="70" y2="30" stroke={Colors.gridLine} strokeWidth="1" />
 
         {/* Bar chart — monochrome shades */}
         <Rect x="20" y="34" width="10" height="12" rx="3" fill={Palette.chartMuted} />
@@ -49,9 +52,9 @@ function MonochromeIllustration() {
         <Circle cx="68" cy="16" r="3" fill={Palette.silverTop} />
 
         {/* Easel legs */}
-        <Line x1="28" y1="60" x2="22" y2="80" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round" />
-        <Line x1="60" y1="60" x2="66" y2="80" stroke="rgba(255,255,255,0.2)" strokeWidth="1.5" strokeLinecap="round" />
-        <Line x1="44" y1="60" x2="44" y2="78" stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeLinecap="round" />
+        <Line x1="28" y1="60" x2="22" y2="80" stroke={Colors.border} strokeWidth="1.5" strokeLinecap="round" />
+        <Line x1="60" y1="60" x2="66" y2="80" stroke={Colors.border} strokeWidth="1.5" strokeLinecap="round" />
+        <Line x1="44" y1="60" x2="44" y2="78" stroke={Colors.border} strokeWidth="1" strokeLinecap="round" />
 
         {/* Coin stack */}
         <Polygon points="8,78 20,74 32,78 20,82" fill={Palette.bgRaisedAlt} />
@@ -59,7 +62,7 @@ function MonochromeIllustration() {
         <Polygon points="8,70 20,66 32,70 20,74" fill={Palette.chartMid} />
         <Polygon points="8,66 20,62 32,66 20,70" fill={Palette.silverBottom} />
         {/* Top coin highlight */}
-        <Path d="M8,66 Q20,62 32,66" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
+        <Path d="M8,66 Q20,62 32,66" stroke={Colors.highlightTop} strokeWidth="0.8" />
 
         {/* SVG gradient def */}
         <Defs>
@@ -79,6 +82,9 @@ export const HeroInfoCard: React.FC<HeroInfoCardProps> = ({
   pillLabel,
   onPillPress,
 }) => {
+  const { Gradients } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   return (
     <LinearGradient
       colors={Gradients.raised}
@@ -108,7 +114,7 @@ export const HeroInfoCard: React.FC<HeroInfoCardProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   card: {
     borderRadius: Radius['2xl'],
     borderWidth: 1,

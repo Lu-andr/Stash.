@@ -1,12 +1,13 @@
-import { Palette } from '../constants/theme';
+import { getAppTheme } from '../constants/theme';
 import { budgetSpent, walletBalance, type LocalState, type LocalTransaction, type LocalGoal, type LocalRecurring } from './domain';
 export type TransactionType = LocalTransaction['type'];
 export type GoalItem = LocalGoal;
 export type RecurringItem = LocalRecurring & { daysUntil: number };
 export interface BudgetItem { id: string; name: string; category: string; spent: number; limit: number; iconName: string; isOverspent: boolean }
 const monthLabel = (d: Date) => d.toLocaleDateString('en-US', { month: 'short' });
-const shades = [Palette.silverTop, Palette.chartSoft, Palette.chartMid, Palette.chartMuted];
 export function projectLocalData(state: LocalState, now = new Date()) {
+  const { Palette } = getAppTheme(state.settings.theme);
+  const shades = [Palette.silverTop, Palette.chartSoft, Palette.chartMid, Palette.chartMuted];
   const currency = state.settings.currency;
   const transactions = state.transactions.filter(t => t.currency === currency);
   const budgets = state.budgets.filter(b => b.currency === currency);

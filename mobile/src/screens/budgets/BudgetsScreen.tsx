@@ -9,13 +9,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { useLocalData, formatMoney } from '../../data/localData';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export const BudgetsScreen: React.FC = () => {
+  const { Colors, Gradients, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation<Nav>();
   const { LOCAL_BUDGET_ITEMS, LOCAL_TOTAL_BUDGET, LOCAL_TOTAL_SPENT } = useLocalData();
   const budgetItems = LOCAL_BUDGET_ITEMS;
@@ -37,7 +41,7 @@ export const BudgetsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.bgBase} />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} backgroundColor={Colors.bgBase} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -293,7 +297,7 @@ export const BudgetsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.bgBase },
 
   header: {

@@ -1,8 +1,8 @@
-import { Palette } from './src/constants/theme';
+import { useAppTheme } from './src/context/useAppTheme';
 import 'react-native-gesture-handler';
-import React from 'react';
-import { View, ActivityIndicator } from 'react-native';
-import { DarkTheme, NavigationContainer } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { View, ActivityIndicator, Appearance } from 'react-native';
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -10,20 +10,23 @@ import { Ionicons } from '@expo/vector-icons';
 import { LocalDataProvider } from './src/context/LocalDataContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 
-const navigationTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: Palette.silverTop,
-    background: Palette.bgBase,
-    card: Palette.bgInset,
-    text: Palette.textPrimary,
-    border: Palette.borderHairline,
-    notification: Palette.danger,
-  },
-};
-
 export default function App() {
+  const { Palette, isLight, mode } = useAppTheme();
+  useEffect(() => { Appearance.setColorScheme(mode); }, [mode]);
+  const baseTheme = isLight ? DefaultTheme : DarkTheme;
+  const navigationTheme = {
+    ...baseTheme,
+    colors: {
+      ...baseTheme.colors,
+      primary: Palette.silverTop,
+      background: Palette.bgBase,
+      card: Palette.bgInset,
+      text: Palette.textPrimary,
+      border: Palette.borderHairline,
+      notification: Palette.danger,
+    },
+  };
+
   const [fontsLoaded] = useFonts({
     ...Ionicons.font,
     // Manrope — premium geometric sans used throughout the app
@@ -53,7 +56,7 @@ export default function App() {
         <NavigationContainer theme={navigationTheme}>
           <AppNavigator />
         </NavigationContainer>
-        <StatusBar style="light" />
+        <StatusBar style={isLight ? "dark" : "light"} />
       </LocalDataProvider>
     </SafeAreaProvider>
   );

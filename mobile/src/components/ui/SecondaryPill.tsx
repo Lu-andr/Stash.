@@ -1,7 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Palette, Colors, Typography, Radius, Gradients } from '../../constants/theme';
+import { Typography, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 interface SecondaryPillProps {
   label: string;
@@ -9,6 +10,9 @@ interface SecondaryPillProps {
 }
 
 export const SecondaryPill: React.FC<SecondaryPillProps> = ({ label, onPress }) => {
+  const { Palette } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -28,7 +32,7 @@ export const SecondaryPill: React.FC<SecondaryPillProps> = ({ label, onPress }) 
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   touch: {
     borderRadius: Radius.full,
     overflow: 'hidden',

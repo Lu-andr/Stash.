@@ -8,7 +8,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Palette, Radius } from '../../constants/theme';
+import { Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 export type NavTab = 'home' | 'insights' | 'wallets';
 
@@ -36,6 +37,9 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
   onTabPress,
   onAddPress,
 }) => {
+  const { Palette } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const insets = useSafeAreaInsets();
   // Fixed at bottom: 16px + safe area
   const bottomPosition = 16 + insets.bottom;
@@ -71,7 +75,7 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
                     end={{ x: 0, y: 1 }}
                     style={styles.navBtn}
                   >
-                    <Ionicons name={item.iconActive} size={22} color={Palette.bgBase} />
+                    <Ionicons name={item.iconActive} size={22} color={Palette.onSilver} />
                   </LinearGradient>
                 ) : (
                   <View style={[styles.navBtn, styles.navBtnInactive]}>
@@ -99,14 +103,14 @@ export const FloatingNav: React.FC<FloatingNavProps> = ({
           end={{ x: 0, y: 1 }}
           style={styles.addBtn}
         >
-          <Ionicons name="add" size={28} color={Palette.bgBase} />
+          <Ionicons name="add" size={28} color={Palette.onSilver} />
         </LinearGradient>
       </TouchableOpacity>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Palette }: AppTheme) => StyleSheet.create({
   container: {
     position: 'absolute',
     left: 16,

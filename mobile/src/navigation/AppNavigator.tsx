@@ -2,7 +2,7 @@ import React from 'react';
 import { createBottomTabNavigator, type BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { CompositeNavigationProp, NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator, type NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Colors } from '../constants/theme';
+import { useAppTheme } from '../context/useAppTheme';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { InsightsScreen } from '../screens/insights/InsightsScreen';
 import { WalletsScreen } from '../screens/wallets/WalletsScreen';
@@ -38,6 +38,8 @@ function MainTabs() {
   </Tab.Navigator>;
 }
 export function AppNavigator() {
+  const { Colors } = useAppTheme();
+
   return <Stack.Navigator initialRouteName="Main" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.bgBase } }}>
     <Stack.Screen name="Main" component={MainTabs} />
     <Stack.Screen name="WalletForm" component={WalletFormScreen} options={{ presentation: 'modal' }} />

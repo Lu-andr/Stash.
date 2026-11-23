@@ -3,11 +3,15 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Switch, Alert } f
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { CURRENCIES } from '../../data/domain';
 import { localStore } from '../../data/repository';
 import { useLocalState } from '../../context/LocalDataContext';
 export const SettingsScreen: React.FC = () => {
+  const { Colors, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation(), state = useLocalState();
   const prefs = state.settings;
   const updatePref = (key: keyof typeof prefs, value: any) => {
@@ -34,8 +38,10 @@ export const SettingsScreen: React.FC = () => {
       <View style={styles.sectionGroup}>
         <Text style={styles.sectionTitle}>APPEARANCE</Text>
         <View style={styles.cardGroup}><View style={styles.row}>
-          <View style={styles.currencyIconWrap}><Ionicons name="moon-outline" size={18} color={Colors.text} /></View>
-          <Text style={styles.rowLabel}>Deep Navy</Text><Ionicons name="checkmark-circle" size={20} color={Colors.primary} />
+          <View style={styles.currencyIconWrap}><Ionicons name={isLight ? "sunny-outline" : "moon-outline"} size={18} color={Colors.text} /></View>
+          <Text style={styles.rowLabel}>Light mode</Text><Switch accessibilityLabel="Light mode" value={prefs.theme === 'light'}
+            onValueChange={value => updatePref('theme', value ? 'light' : 'dark')}
+            trackColor={{ false: Colors.surfaceAlt, true: Colors.primary }} thumbColor={Colors.onSilver} />
         </View></View>
       </View>
       <View style={styles.sectionGroup}>
@@ -59,7 +65,7 @@ export const SettingsScreen: React.FC = () => {
   </SafeAreaView>;
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: Colors.bgBase,

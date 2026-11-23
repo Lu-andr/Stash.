@@ -1,8 +1,8 @@
-// ─── PeraGo Deep Navy Design Tokens ────────────────────────────────
+// ─── PeraGo Design Tokens ────────────────────────────────
 // Single source of truth. No raw hex values inside components.
 
 // ── Raw palette ──────────────────────────────────────────────────────────────
-export const Palette = {
+const darkPalette = {
   // Canvas / surfaces
   bgBase:          '#071426',
   bgInset:         '#0B1C33',
@@ -52,8 +52,27 @@ export const Palette = {
   gridLine:        'rgba(147,197,253,0.06)',
 } as const;
 
-// ── Semantic aliases (what components should import) ─────────────────────────
-export const Colors = {
+export type ThemeMode = 'dark' | 'light';
+type ThemePalette = { [K in keyof typeof darkPalette]: string };
+const lightPalette: ThemePalette = {
+  bgBase: '#F3F7FC', bgInset: '#E8EFF8', bgRaisedTop: '#FFFFFF', bgRaisedBottom: '#F5F8FD',
+  bgGlass: 'rgba(255,255,255,0.96)', bgRaisedAlt: '#E2EBF6',
+  surfaceHigh: '#D6E4F4', detailTop: '#EDF4FC', detailBottom: '#DCE9F8',
+  chartMuted: '#486B92', chartMid: '#2A6099', chartSoft: '#447AAE',
+  borderHairline: 'rgba(24,57,96,0.18)', highlightTop: 'rgba(255,255,255,0.9)',
+  shadowLift: 'rgba(19,48,81,0.16)',
+  textPrimary: '#102842', textSecondary: '#37536F', textMuted: '#4C6580',
+  silverTop: '#225C99', silverBottom: '#174979', onSilver: '#FFFFFF',
+  heroFade0: '#DCEBFC', heroFade1: '#E6F0FC', heroFade2: '#EFF5FC', heroFade3: '#F3F7FC',
+  income: '#176A3B', warning: '#805000', danger: '#B4232D',
+  incomeAlpha: 'rgba(23,106,59,0.10)', warningAlpha: 'rgba(128,80,0,0.10)', dangerAlpha: 'rgba(180,35,45,0.10)',
+  gridLine: 'rgba(24,57,96,0.08)',
+};
+
+// ── Semantic aliases (shared by both appearances) ───────────────────────────
+function createColors(Palette: ThemePalette, light: boolean) {
+  return {
+
   // Backgrounds
   background:    Palette.bgBase,
   secondaryBg:   Palette.bgInset,
@@ -67,13 +86,13 @@ export const Colors = {
 
   // Borders / highlights
   border:        Palette.borderHairline,
-  borderAlt:     'rgba(186,220,255,0.18)',
+  borderAlt:     Palette.borderHairline,
   highlightTop:  Palette.highlightTop,
 
   // Primary accent — ice blue on deep navy
   primary:       Palette.silverTop,
   primaryDark:   Palette.silverBottom,
-  primaryLight:  'rgba(99,172,242,0.16)',
+  primaryLight:  light ? 'rgba(34,92,153,0.12)' : 'rgba(99,172,242,0.16)',
 
   // Silver (used in new premium components via Gradients.silver directly)
   silverTop:     Palette.silverTop,
@@ -103,7 +122,7 @@ export const Colors = {
 
   // Overlays
   overlay:       'rgba(0, 0, 0, 0.7)',
-  overlayLight:  'rgba(255, 255, 255, 0.04)',
+  overlayLight:  light ? 'rgba(24,57,96,0.04)' : 'rgba(255,255,255,0.04)',
   gridLine:      Palette.gridLine,
 
   // Legacy compat aliases
@@ -114,7 +133,7 @@ export const Colors = {
   darkBorder:    Palette.borderHairline,
   darkText:      Palette.textPrimary,
   darkTextSecondary: Palette.textSecondary,
-  primaryOverlay: 'rgba(99,172,242,0.12)',
+  primaryOverlay: light ? 'rgba(34,92,153,0.10)' : 'rgba(99,172,242,0.12)',
   errorLight2:   Palette.dangerAlpha,
   successLight2: Palette.incomeAlpha,
   warningLight2: Palette.warningAlpha,
@@ -122,14 +141,15 @@ export const Colors = {
   divider:       Palette.borderHairline,
   borderLight:   Palette.bgRaisedAlt,
 } as const;
+}
 
 // Gradient arrays — pass directly to LinearGradient colors prop
-export const Gradients = {
+function createGradients(Palette: ThemePalette) { return {
   raised:      [Palette.bgRaisedTop, Palette.bgRaisedBottom] as const,
   silver:      [Palette.silverTop,   Palette.silverBottom]   as const,
   heroFade:    [Palette.heroFade0, Palette.heroFade1, Palette.heroFade2, Palette.heroFade3] as const,
   heroFadeLocations: [0, 0.28, 0.62, 1] as const,
-} as const;
+} as const; }
 
 // ── Typography ────────────────────────────────────────────────────────────────
 export const Typography = {
@@ -198,7 +218,7 @@ export const Radius = {
 } as const;
 
 // ── Shadows ───────────────────────────────────────────────────────────────────
-export const Shadow = {
+const darkShadow = {
   sm: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -235,3 +255,18 @@ export const Touch = {
   min: 44,    // px — minimum touch target size
   gap: 8,     // px — minimum gap between targets
 } as const;
+
+function buildTheme(mode: ThemeMode) {
+  const light = mode === 'light';
+  const Palette: ThemePalette = light ? lightPalette : darkPalette;
+  const Shadow = light ? {
+    sm: { ...darkShadow.sm, shadowOpacity: 0.08 },
+    md: { ...darkShadow.md, shadowOpacity: 0.10 },
+    lg: { ...darkShadow.lg, shadowOpacity: 0.14 },
+    primary: { ...darkShadow.primary, shadowOpacity: 0.12 },
+  } : darkShadow;
+  return { mode, isLight: light, Palette, Colors: createColors(Palette, light), Gradients: createGradients(Palette), Shadow };
+}
+export type AppTheme = ReturnType<typeof buildTheme>;
+export const Themes = { dark: buildTheme('dark'), light: buildTheme('light') };
+export function getAppTheme(mode: ThemeMode) { return Themes[mode]; }

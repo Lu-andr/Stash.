@@ -4,11 +4,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
-import { Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { useLocalState } from '../../context/LocalDataContext';
 import { localStore } from '../../data/repository';
 import { CURRENCIES, WALLET_TYPES, type Currency, type WalletType } from '../../data/domain';
 export function WalletFormScreen() {
+  const { Colors } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const route = useRoute<RouteProp<RootStackParamList, 'WalletForm'>>(), navigation = useNavigation();
   const state = useLocalState(), id = route.params?.walletId, wallet = state.wallets.find(w => w.id === id);
   const [name, setName] = useState(wallet?.name ?? '');
@@ -50,7 +54,7 @@ export function WalletFormScreen() {
     </KeyboardAvoidingView>
   </SafeAreaView>;
 }
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.bgBase },
   header: { flexDirection: 'row', alignItems: 'center', gap: Spacing.base, padding: Spacing.lg },
   circle: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.surface, borderRadius: Radius.full },

@@ -4,7 +4,8 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Palette, Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 interface InsightRowProps {
   title: string;
@@ -21,6 +22,9 @@ export const InsightRow: React.FC<InsightRowProps> = ({
   iconName = 'information-circle-outline',
   onPress,
 }) => {
+  const { Colors, Gradients } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () =>
@@ -73,7 +77,7 @@ export const InsightRow: React.FC<InsightRowProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Palette, Shadow }: AppTheme) => StyleSheet.create({
   row: {
     height: 72,
     borderRadius: Radius.row,

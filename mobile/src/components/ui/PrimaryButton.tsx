@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 import { Animated, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Palette, Colors, Gradients, Typography, Radius, Shadow } from '../../constants/theme';
+import { Typography, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 interface PrimaryButtonProps {
   label: string;
@@ -14,6 +15,9 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   onPress,
   disabled = false,
 }) => {
+  const { Palette, Gradients } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
@@ -47,7 +51,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   wrapper: {
     ...Shadow.md,
     borderRadius: Radius.full,

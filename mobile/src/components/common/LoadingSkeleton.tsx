@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, View, StyleSheet } from 'react-native';
-import { Colors, Radius, Spacing } from '../../constants/theme';
+import { Radius, Spacing, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 interface SkeletonProps {
   width?: number | string;
@@ -15,6 +16,8 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   borderRadius = Radius.sm,
   style,
 }) => {
+  const { Colors } = useAppTheme();
+
   const anim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -43,7 +46,10 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   );
 };
 
-export const DashboardSkeleton: React.FC = () => (
+export const DashboardSkeleton: React.FC = () => {
+
+  const styles = useThemedStyles(createStyles);
+  return (
   <View style={styles.container}>
     {/* Balance card */}
     <View style={styles.card}>
@@ -84,8 +90,12 @@ export const DashboardSkeleton: React.FC = () => (
     </View>
   </View>
 );
+};
 
-export const TransactionSkeleton: React.FC = () => (
+export const TransactionSkeleton: React.FC = () => {
+
+  const styles = useThemedStyles(createStyles);
+  return (
   <View style={[styles.row, { padding: Spacing.base, marginBottom: 4 }]}>
     <Skeleton width={44} height={44} borderRadius={22} />
     <View style={{ flex: 1, marginLeft: 12 }}>
@@ -95,8 +105,9 @@ export const TransactionSkeleton: React.FC = () => (
     <Skeleton width={70} height={14} />
   </View>
 );
+};
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   container: {
     padding: Spacing.base,
     gap: Spacing.base,

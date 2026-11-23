@@ -9,9 +9,8 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, DashboardNavigation } from '../../navigation/AppNavigator';
 
-import { Palette,
-  Colors, Gradients, Typography, Spacing, Radius, Shadow,
-} from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
 import { formatMoney } from '../../utils/formatting';
 import { useLocalState } from '../../context/LocalDataContext';
@@ -21,6 +20,9 @@ import { WALLET_TYPES, walletBalance, type Wallet } from '../../data/domain';
 const TYPE_LABELS = Object.fromEntries(WALLET_TYPES.map(t => [t.value, t.label]));
 
 function WalletCard({ account, onEdit, onDelete }: { account: Wallet & { balance: number; iconName: string }; onEdit: () => void; onDelete: () => void }) {
+  const { Colors, Gradients } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const isNegative = account.balance < 0;
 
   return (
@@ -73,6 +75,9 @@ function WalletCard({ account, onEdit, onDelete }: { account: Wallet & { balance
 type Nav = DashboardNavigation;
 
 export const WalletsScreen: React.FC = () => {
+  const { Colors, Palette, Gradients, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation<Nav>();
   const [activeTab, setActiveTab] = useState<NavTab>('wallets');
 
@@ -92,7 +97,7 @@ export const WalletsScreen: React.FC = () => {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} />
       <SafeAreaView style={styles.safe} edges={['top']}>
         {/* Header */}
         <View style={styles.header}>
@@ -174,7 +179,7 @@ export const WalletsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.bgBase },
   safe: { flex: 1 },
   scroll: { flex: 1 },

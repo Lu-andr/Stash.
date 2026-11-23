@@ -6,7 +6,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { localStore } from '../../data/repository';
 import { useLocalState } from '../../context/LocalDataContext';
 import { CURRENCIES, newId } from '../../data/domain';
@@ -23,6 +24,9 @@ const PERIODS = [
 ];
 
 export const CreateBudgetScreen: React.FC = () => {
+  const { Colors, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation<Nav>();
   const [name, setName] = useState('Monthly Budget');
   const [totalAmount, setTotalAmount] = useState('');
@@ -69,7 +73,7 @@ export const CreateBudgetScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} backgroundColor={Colors.background} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -285,7 +289,7 @@ export const CreateBudgetScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Palette }: AppTheme) => StyleSheet.create({
   safe: {
     flex: 1,
     backgroundColor: Colors.background,
@@ -597,7 +601,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   createBtnText: {
-    color: Palette.bgBase,
+    color: Palette.onSilver,
     fontSize: Typography.base,
     fontWeight: Typography.bold,
   },

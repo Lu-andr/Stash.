@@ -2,7 +2,7 @@
   "expo": {
     "name": "PeraGo",
     "slug": "perago",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -24,7 +24,7 @@
         "backgroundColor": "#071426"
       },
       "package": "app.stash",
-      "versionCode": 3,
+      "versionCode": 4,
       "allowBackup": false,
       "permissions": [],
       "blockedPermissions": [

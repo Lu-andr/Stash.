@@ -7,7 +7,8 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { AppLogo } from '../../components/ui/AppLogo';
 import { HeroInfoCard } from '../../components/ui/HeroInfoCard';
 import { FeaturedPill } from '../../components/ui/FeaturedPill';
@@ -20,6 +21,9 @@ import { useLocalData } from '../../data/localData';
 type Nav = DashboardNavigation;
 
 export const InsightsScreen: React.FC = () => {
+  const { Colors, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation<Nav>();
   const { LOCAL_INSIGHTS, LOCAL_BUDGET_USED_PCT, state } = useLocalData();
   const [activeTab, setActiveTab] = useState<NavTab>('insights');
@@ -68,7 +72,7 @@ export const InsightsScreen: React.FC = () => {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} />
       <SafeAreaView style={styles.safe} edges={['top']}>
         {/* Top Header Row */}
         <View style={styles.header}>
@@ -159,7 +163,7 @@ export const InsightsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: Colors.bgBase,

@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 interface FeaturedPillProps {
   title: string;
@@ -17,6 +18,9 @@ export const FeaturedPill: React.FC<FeaturedPillProps> = ({
   onPress,
   iconName = 'wallet-outline',
 }) => {
+  const { Colors, Gradients } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   return (
     <TouchableOpacity
       style={styles.wrapper}
@@ -56,7 +60,7 @@ export const FeaturedPill: React.FC<FeaturedPillProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   wrapper: {
     ...Shadow.md,
   },

@@ -1,13 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Palette, Colors, Gradients, Typography, Radius } from '../../constants/theme';
+import { Typography, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 interface AppLogoProps {
   size?: 'sm' | 'md';
 }
 
 export const AppLogo: React.FC<AppLogoProps> = ({ size = 'md' }) => {
+  const { Palette } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const circleSize = size === 'sm' ? 24 : 28;
   const fontSize = size === 'sm' ? 11 : 13;
 
@@ -39,7 +43,7 @@ export const AppLogo: React.FC<AppLogoProps> = ({ size = 'md' }) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',

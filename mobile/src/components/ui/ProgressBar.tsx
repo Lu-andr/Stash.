@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, StyleSheet, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors, Gradients, Radius } from '../../constants/theme';
+import { Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 interface ProgressBarProps {
   value: number; // 0–100
@@ -14,6 +15,9 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   animated = true,
   duration = 700,
 }) => {
+  const { Gradients } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const widthAnim = useRef(new Animated.Value(0)).current;
   const clampedValue = Math.min(100, Math.max(0, value));
 
@@ -54,7 +58,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   track: {
     height: 20,
     borderRadius: Radius.full,

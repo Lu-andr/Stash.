@@ -1,3 +1,4 @@
+import { getAppTheme, type ThemeMode } from '../constants/theme';
 export type Currency = typeof CURRENCIES[number]['value'];
 export type WalletType = 'cash' | 'card' | 'savings' | 'wallet';
 export interface Wallet { id: string; name: string; type: WalletType; currency: Currency; initialBalance: number }
@@ -15,7 +16,7 @@ export interface LocalBudget {
 export interface LocalRecurring { id: string; name: string; amount: number; frequency: string; nextDate: string; category: string; iconName: string; currency: Currency }
 export interface LocalGoal { id: string; name: string; targetAmount: number; currentAmount: number; targetDate: string; iconName: string; currency: Currency }
 export interface LocalRule { id: string; keyword: string; category: string; categoryIcon: string; enabled: boolean; matchCount: number }
-export interface LocalSettings { currency: Currency; budgetWarnings: boolean }
+export interface LocalSettings { currency: Currency; budgetWarnings: boolean; theme: ThemeMode }
 export interface LocalState {
   version: 1; wallets: Wallet[]; transactions: LocalTransaction[]; categories: LocalCategory[];
   budgets: LocalBudget[]; recurring: LocalRecurring[]; goals: LocalGoal[]; rules: LocalRule[];
@@ -59,7 +60,7 @@ export function initialState(): LocalState {
       { id: 'cat-7', label: 'Income', iconName: 'wallet-outline' },
       { id: 'cat-8', label: 'Other', iconName: 'ellipsis-horizontal-outline' },
     ],
-    settings: { currency: 'INR', budgetWarnings: true },
+    settings: { currency: 'INR', budgetWarnings: true, theme: 'dark' },
   };
 }
 export function isCurrency(value: unknown): value is Currency { return CURRENCIES.some(c => c.value === value); }
@@ -75,7 +76,7 @@ export function transactionView(state: LocalState, t: LocalTransaction) {
   const category = state.categories.find(c => c.id === t.categoryId);
   return {
     id: t.id, title: t.merchant, amount: t.amount, type: t.type, wallet_id: t.walletId, currency: t.currency,
-    category_id: t.categoryId, category: { id: t.categoryId, name: t.category, icon: t.iconName, color: '#A9D6FF', type: 'both' as const, is_default: !!category },
+    category_id: t.categoryId, category: { id: t.categoryId, name: t.category, icon: t.iconName, color: getAppTheme(state.settings.theme).Colors.primary, type: 'both' as const, is_default: !!category },
     date: t.date, payment_method: state.wallets.find(w => w.id === t.walletId)?.name ?? 'Removed wallet',
     notes: t.notes, created_at: t.createdAt, updated_at: t.date,
   };
@@ -107,7 +108,7 @@ export function budgetSpent(state: LocalState, budget: LocalBudget, categoryId?:
     .reduce((sum, t) => sum + t.amount, 0);
 }
 export function validateState(s: any): asserts s is LocalState {
-  if (!s || s.version !== 1 || !isCurrency(s.settings?.currency) || typeof s.settings.budgetWarnings !== 'boolean') throw new Error('Unsupported or damaged local data. Your stored data has not been overwritten.');
+  if (!s || s.version !== 1 || !isCurrency(s.settings?.currency) || typeof s.settings.budgetWarnings !== 'boolean' || !['dark', 'light'].includes(s.settings.theme)) throw new Error('Unsupported or damaged local data. Your stored data has not been overwritten.');
   for (const key of ['wallets', 'transactions', 'categories', 'budgets', 'recurring', 'goals', 'rules']) {
     if (!Array.isArray(s[key])) throw new Error('Damaged local data: ' + key);
     const ids = new Set<string>();

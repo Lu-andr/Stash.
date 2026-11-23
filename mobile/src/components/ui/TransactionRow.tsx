@@ -4,9 +4,8 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import {
-  Colors, Gradients, Typography, Spacing, Radius, Shadow,
-} from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { formatMoney, TransactionType } from '../../data/localData';
 
 interface TransactionRowProps {
@@ -30,6 +29,9 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({
   iconName = 'receipt-outline',
   onPress,
 }) => {
+  const { Colors, Gradients } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const brightnessAnim = useRef(new Animated.Value(1)).current;
 
@@ -91,7 +93,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Shadow }: AppTheme) => StyleSheet.create({
   row: {
     height: 72,
     borderRadius: Radius.row,

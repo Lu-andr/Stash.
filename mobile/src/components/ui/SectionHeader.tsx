@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors, Typography, Spacing } from '../../constants/theme';
+import { Typography, Spacing, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 interface SectionHeaderProps {
   title: string;
@@ -13,6 +14,9 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   action = 'See All',
   onActionPress,
 }) => {
+
+  const styles = useThemedStyles(createStyles);
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
@@ -32,7 +36,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',

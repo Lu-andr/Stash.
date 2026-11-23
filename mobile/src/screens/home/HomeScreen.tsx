@@ -8,7 +8,8 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 
-import { Palette, Colors, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { AppLogo } from '../../components/ui/AppLogo';
 import { GlossyChip } from '../../components/ui/GlossyChip';
 import { SearchBar } from '../../components/ui/SearchBar';
@@ -19,9 +20,14 @@ import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
 import { RootStackParamList, DashboardNavigation } from '../../navigation/AppNavigator';
 import { useLocalData, formatMoney } from '../../data/localData';
 
+import { openPrivacyPolicy } from '../../utils/openPrivacyPolicy';
+
 type Nav = DashboardNavigation;
 
 export const HomeScreen: React.FC = () => {
+  const { Colors, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation<Nav>();
   const { LOCAL_TRANSACTIONS, LOCAL_BALANCE, state } = useLocalData();
   const [activeTab, setActiveTab] = useState<NavTab>('home');
@@ -84,7 +90,7 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} />
       <SafeAreaView style={styles.safe} edges={['top']}>
         <ScrollView
           style={styles.scroll}
@@ -252,6 +258,15 @@ export const HomeScreen: React.FC = () => {
                 </TouchableOpacity>
               ))}
 
+            <TouchableOpacity style={styles.menuRow} activeOpacity={0.7}
+                accessibilityRole="link" accessibilityLabel="Privacy Policy, opens in browser"
+                onPress={() => { setMenuVisible(false); void openPrivacyPolicy(); }}>
+                <View style={styles.menuRowIconWrap}>
+                  <Ionicons name="shield-checkmark-outline" size={18} color={Colors.text} />
+                </View>
+                <Text style={styles.menuRowText}>Privacy Policy</Text>
+                <Ionicons name="open-outline" size={16} color={Colors.textMuted} />
+              </TouchableOpacity>
             </ScrollView>
           </View>
         </TouchableOpacity>
@@ -260,7 +275,7 @@ export const HomeScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Palette, Shadow }: AppTheme) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: Colors.bgBase,

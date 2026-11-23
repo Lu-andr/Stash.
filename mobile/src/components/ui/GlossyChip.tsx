@@ -2,7 +2,8 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Svg, { Circle, Path, Line, Polyline } from 'react-native-svg';
-import { Palette, Colors, Gradients } from '../../constants/theme';
+import { type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 
 export type ChipIconType = 'coin' | 'chart' | 'shield';
 
@@ -13,6 +14,8 @@ interface GlossyChipProps {
 
 // Inline SVG icons — monochrome gradient filled
 function CoinIcon() {
+  const { Palette } = useAppTheme();
+
   return (
     <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
       <Circle cx="12" cy="12" r="9" stroke={Palette.silverTop} strokeWidth="1.8" />
@@ -23,6 +26,8 @@ function CoinIcon() {
 }
 
 function ChartIcon() {
+  const { Palette } = useAppTheme();
+
   return (
     <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
       <Polyline points="3,17 8,12 13,14 21,6" stroke={Palette.silverTop} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -32,6 +37,8 @@ function ChartIcon() {
 }
 
 function ShieldIcon() {
+  const { Palette } = useAppTheme();
+
   return (
     <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
       <Path d="M12 3L4 7v5c0 5.25 3.5 10.15 8 11 4.5-.85 8-5.75 8-11V7L12 3z" stroke={Palette.silverTop} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
@@ -47,6 +54,9 @@ const iconMap: Record<ChipIconType, React.FC> = {
 };
 
 export const GlossyChip: React.FC<GlossyChipProps> = ({ icon, rotation = 6 }) => {
+  const { Palette } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const IconComponent = iconMap[icon];
 
   return (
@@ -73,7 +83,7 @@ export const GlossyChip: React.FC<GlossyChipProps> = ({ icon, rotation = 6 }) =>
 const CHIP_HEIGHT = 40;
 const CHIP_WIDTH = 48;
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   wrapper: {
     // Inline in text — display handled by parent
   },

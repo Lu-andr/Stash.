@@ -8,7 +8,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { EmptyState } from '../../components/common/EmptyState';
 import { TransactionSkeleton } from '../../components/common/LoadingSkeleton';
 import { useTransactions } from '../../hooks/useTransactions';
@@ -42,6 +43,9 @@ const getCategoryIcon = (name: string): any => {
 };
 
 export const TransactionsScreen: React.FC = () => {
+  const { Colors, Palette, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation<Nav>();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
@@ -111,7 +115,7 @@ export const TransactionsScreen: React.FC = () => {
   if (isLoading && transactions.length === 0) {
     return (
       <SafeAreaView style={styles.safe} edges={['top']}>
-        <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
+        <StatusBar barStyle={isLight ? "dark-content" : "light-content"} backgroundColor={Colors.background} />
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Transactions</Text>
         </View>
@@ -122,7 +126,7 @@ export const TransactionsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <StatusBar barStyle="light-content" backgroundColor={Colors.background} />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} backgroundColor={Colors.background} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -147,7 +151,7 @@ export const TransactionsScreen: React.FC = () => {
           onPress={() => navigation.navigate('AddTransaction' as any, {})}
           activeOpacity={0.8}
         >
-          <Ionicons name="add" size={20} color={Palette.bgBase} />
+          <Ionicons name="add" size={20} color={Palette.onSilver} />
         </TouchableOpacity>
       </View>
 
@@ -232,7 +236,7 @@ export const TransactionsScreen: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors, Palette }: AppTheme) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: Colors.background },
 
   header: {

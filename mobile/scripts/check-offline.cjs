@@ -1,7 +1,12 @@
 const fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
 function files(dir) { return fs.readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? files(path.join(dir, e.name)) : [path.join(dir, e.name)]); }
 for (const file of [path.resolve('App.tsx'), ...files(path.resolve('src')).filter(f => /\.tsx?$/.test(f))]) {
-  const source = fs.readFileSync(file, 'utf8');
+  let source = fs.readFileSync(file, 'utf8');
+  // Only this fixed, user-initiated external browser link is allowed.
+  if (file === path.resolve('src/constants/legal.ts')) {
+    assert.equal(source.trim(), "export const PRIVACY_POLICY_URL = 'https://loanshark.cc/privacy.html';");
+    source = '';
+  }
   for (const forbidden of [
     /\bfetch\s*\(/, /\bXMLHttpRequest\b/, /\bWebSocket\b/, /https?:\/\//,
     /AuthContext|AuthProvider|useAuth|API_ENDPOINTS|API_BASE_URL/, /expo-secure-store|expo-notifications/,

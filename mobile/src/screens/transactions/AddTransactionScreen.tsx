@@ -9,7 +9,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { RootStackParamList } from '../../navigation/AppNavigator';
 
-import { Palette, Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
+import { Typography, Spacing, Radius, type AppTheme } from '../../constants/theme';
+import { useAppTheme, useThemedStyles } from '../../context/useAppTheme';
 import { PrimaryButton } from '../../components/ui/PrimaryButton';
 import { useLocalData } from '../../data/localData';
 import { localStore } from '../../data/repository';
@@ -23,6 +24,9 @@ const KEYPAD = [
 ];
 
 function GlossyKey({ label, onPress }: { label: string; onPress: () => void }) {
+  const { Palette } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () =>
@@ -55,6 +59,9 @@ function GlossyKey({ label, onPress }: { label: string; onPress: () => void }) {
 }
 
 export const AddTransactionScreen: React.FC = () => {
+  const { Colors, Palette, Gradients, isLight } = useAppTheme();
+  const styles = useThemedStyles(createStyles);
+
   const navigation = useNavigation();
   const route = useRoute<RouteProp<RootStackParamList, 'AddTransaction'>>();
   const { state, LOCAL_CATEGORIES } = useLocalData();
@@ -116,7 +123,7 @@ export const AddTransactionScreen: React.FC = () => {
 
   return (
     <View style={styles.root}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle={isLight ? "dark-content" : "light-content"} />
 
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
         <Animated.View style={[styles.sheet, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
@@ -263,7 +270,7 @@ export const AddTransactionScreen: React.FC = () => {
 const KEY_WIDTH = 76;
 const KEY_HEIGHT = 56;
 
-const styles = StyleSheet.create({
+const createStyles = ({ Colors }: AppTheme) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: Colors.bgBase,
