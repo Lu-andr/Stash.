@@ -57,7 +57,7 @@ export const SettingsScreen: React.FC = () => {
         <View style={styles.cardGroup}><View style={styles.row}>
           <View style={styles.switchTextCol}>
             <Text style={styles.rowLabel}>Manual records on this device</Text>
-            <Text style={styles.rowSublabel}>No registration, bank connections, cloud sync, or telemetry. Removing the app or clearing its storage removes these records.</Text>
+            <Text style={styles.rowSublabel}>Wallets and transactions stay on this device. Financial offers on Android are loaded separately from Firebase when online. No registration or bank connection is required. Removing the app or clearing its storage removes your records.</Text>
           </View>
         </View></View>
       </View>

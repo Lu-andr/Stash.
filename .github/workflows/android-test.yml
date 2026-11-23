@@ -35,7 +35,7 @@ jobs:
         working-directory: mobile
       - run: npm test
         working-directory: mobile
-      - run: npm run check:offline
+      - run: npm run check:local
         working-directory: mobile
       - run: npx tsc --noEmit
         working-directory: mobile
@@ -43,11 +43,11 @@ jobs:
         working-directory: mobile
         env:
           CI: '1'
-      - run: ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a --max-workers=2 --console=plain
+      - run: ./gradlew testReleaseUnitTest assembleRelease -PreactNativeArchitectures=arm64-v8a --max-workers=2 --console=plain
         working-directory: mobile/android
         env:
           NODE_ENV: production
-      - name: Verify merged offline release manifest
+      - name: Verify release manifest and PeraGo resources
         working-directory: mobile
         run: |
           python3 - <<'PY'
@@ -59,7 +59,9 @@ jobs:
           for file in candidates:
               root = ET.parse(file).getroot()
               permissions = {p.get(key+'name') for p in root.findall('uses-permission')}
-              assert not {'android.permission.INTERNET', 'android.permission.ACCESS_NETWORK_STATE'} & permissions
+              assert {'android.permission.INTERNET', 'android.permission.ACCESS_NETWORK_STATE'} <= permissions
+              activity = next(a for a in root.find('application').findall('activity') if a.get(key+'name').endswith('OfferWebViewActivity'))
+              assert activity.get(key+'exported') == 'false'
               assert root.find('application').get(key+'allowBackup') == 'false'
           res = Path('android/app/src/main/res')
           for name in ['ic_launcher.xml', 'ic_launcher_round.xml']:
@@ -68,12 +70,12 @@ jobs:
           inset = ET.parse(res/'drawable/perago_launcher_foreground.xml').getroot()
           assert all(inset.get(key+side) == '20%' for side in ['insetLeft', 'insetTop', 'insetRight', 'insetBottom'])
           assert (res/'drawable-mdpi/splashscreen_logo.png').is_file()
-          print('Offline manifest and PeraGo launcher/splash resources verified')
+          print('Local backup policy, offers activity and PeraGo resources verified')
           PY
-      - run: cp mobile/android/app/build/outputs/apk/release/app-release.apk PeraGo-1.1.2-test-arm64.apk
+      - run: cp mobile/android/app/build/outputs/apk/release/app-release.apk PeraGo-1.1.3-test-arm64.apk
       - uses: actions/upload-artifact@v4
         with:
           name: PeraGo-test-arm64
-          path: PeraGo-1.1.2-test-arm64.apk
+          path: PeraGo-1.1.3-test-arm64.apk
           if-no-files-found: error
           retention-days: 30
