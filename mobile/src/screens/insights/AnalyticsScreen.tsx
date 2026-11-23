@@ -476,9 +476,9 @@ export const AnalyticsScreen: React.FC = () => {
       <FloatingNav
         activeTab={activeTab}
         onTabPress={(tab) => {
-          if (tab === 'home') navigation.navigate('Home' as any);
-          else if (tab === 'insights') navigation.navigate('Insights' as any);
-          else if (tab === 'wallets') navigation.navigate('Wallets' as any);
+          if (tab === 'home') navigation.popTo('Main', { screen: 'Home' });
+          else if (tab === 'insights') navigation.popTo('Main', { screen: 'Insights' });
+          else if (tab === 'wallets') navigation.popTo('Main', { screen: 'Wallets' });
         }}
         onAddPress={() => navigation.navigate('AddTransaction' as any, {})}
       />

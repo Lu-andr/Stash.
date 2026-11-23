@@ -1,4 +1,6 @@
 import React from 'react';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import type { NavigatorScreenParams } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Colors } from '../constants/theme';
 import { HomeScreen } from '../screens/home/HomeScreen';
@@ -15,8 +17,9 @@ import { RecurringScreen } from '../screens/budgets/RecurringScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
 import { AnalyticsScreen } from '../screens/insights/AnalyticsScreen';
 import { SmartRulesScreen } from '../screens/insights/SmartRulesScreen';
+type MainTabParamList = { Home: undefined; Insights: undefined; Wallets: undefined };
 export type RootStackParamList = {
-  Home: undefined; Insights: undefined; Wallets: undefined;
+  Main: NavigatorScreenParams<MainTabParamList> | undefined;
   WalletForm: { walletId?: string } | undefined;
   Transactions: undefined; TransactionDetail: { transactionId: string; iconName?: string };
   AddTransaction: { type?: 'income' | 'expense'; transactionId?: string };
@@ -25,11 +28,17 @@ export type RootStackParamList = {
   Analytics: undefined; SmartRules: undefined;
 };
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
+function MainTabs() {
+  return <Tab.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, tabBarStyle: { display: 'none' } }}>
+    <Tab.Screen name="Home" component={HomeScreen} />
+    <Tab.Screen name="Insights" component={InsightsScreen} />
+    <Tab.Screen name="Wallets" component={WalletsScreen} />
+  </Tab.Navigator>;
+}
 export function AppNavigator() {
-  return <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.bgBase } }}>
-    <Stack.Screen name="Home" component={HomeScreen} />
-    <Stack.Screen name="Insights" component={InsightsScreen} />
-    <Stack.Screen name="Wallets" component={WalletsScreen} />
+  return <Stack.Navigator initialRouteName="Main" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: Colors.bgBase } }}>
+    <Stack.Screen name="Main" component={MainTabs} />
     <Stack.Screen name="WalletForm" component={WalletFormScreen} options={{ presentation: 'modal' }} />
     <Stack.Screen name="Transactions" component={TransactionsScreen} />
     <Stack.Screen name="TransactionDetail" component={TransactionDetailScreen} />

@@ -130,7 +130,7 @@ export const TransactionsScreen: React.FC = () => {
           style={styles.backBtn}
           onPress={() => {
             if (navigation.canGoBack()) navigation.goBack();
-            else navigation.navigate('Home' as any);
+            else navigation.navigate('Main', { screen: 'Home' });
           }}
           activeOpacity={0.8}
           accessibilityLabel="Go back"
