@@ -8,116 +8,22 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
-import { api } from '../../services/api';
-import { API_ENDPOINTS } from '../../constants/api';
-import { Transaction } from '../../types';
+import { localStore } from '../../data/repository';
+import { useLocalState } from '../../context/LocalDataContext';
+import { transactionView } from '../../data/domain';
 import { formatCurrency, formatDateFull, formatTime, getPaymentMethodLabel } from '../../utils/formatting';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { MOCK_TRANSACTIONS } from '../../data/mockData';
 
 type Route = RouteProp<RootStackParamList, 'TransactionDetail'>;
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const resolveCategoryIcon = (
-  paramIcon?: string,
-  categoryIcon?: string,
-  categoryName?: string,
-  title?: string
-): any => {
-  if (paramIcon && paramIcon.endsWith('-outline')) return paramIcon;
-  if (categoryIcon && categoryIcon.endsWith('-outline')) return categoryIcon;
-
-  const target = `${categoryName || ''} ${title || ''}`.toLowerCase();
-  if (target.includes('food') || target.includes('swiggy') || target.includes('zomato') || target.includes('dining') || target.includes('cafe') || target.includes('burger')) {
-    return 'fast-food-outline';
-  }
-  if (target.includes('transport') || target.includes('travel') || target.includes('car') || target.includes('uber') || target.includes('ola') || target.includes('vehic') || target.includes('ride') || target.includes('fuel')) {
-    return 'car-outline';
-  }
-  if (target.includes('subscript') || target.includes('netflix') || target.includes('spotify') || target.includes('prime') || target.includes('tv') || target.includes('stream')) {
-    return 'tv-outline';
-  }
-  if (target.includes('shop') || target.includes('amazon') || target.includes('flipkart') || target.includes('myntra') || target.includes('store') || target.includes('bag')) {
-    return 'bag-handle-outline';
-  }
-  if (target.includes('salary') || target.includes('income') || target.includes('freelance') || target.includes('earning')) {
-    return 'wallet-outline';
-  }
-  if (target.includes('bill') || target.includes('electric') || target.includes('water') || target.includes('utility') || target.includes('recharge') || target.includes('wifi')) {
-    return 'receipt-outline';
-  }
-  if (target.includes('entertain') || target.includes('movie') || target.includes('cinema')) {
-    return 'film-outline';
-  }
-  if (target.includes('health') || target.includes('med') || target.includes('doctor') || target.includes('gym')) {
-    return 'heart-outline';
-  }
-  if (target.includes('educat') || target.includes('book') || target.includes('tuition')) {
-    return 'book-outline';
-  }
-  return 'receipt-outline';
-};
-
 export const TransactionDetailScreen: React.FC = () => {
   const route = useRoute<Route>();
   const navigation = useNavigation<Nav>();
-  const [transaction, setTransaction] = useState<Transaction | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const state = useLocalState();
+  const record = state.transactions.find(t => t.id === route.params.transactionId);
+  const transaction = record ? transactionView(state, record) : null;
   const [isDeleting, setIsDeleting] = useState(false);
-
-  useEffect(() => {
-    loadTransaction();
-  }, [route.params.transactionId]);
-
-  const loadTransaction = async () => {
-    // Check mock transactions first
-    const mock = MOCK_TRANSACTIONS.find(t => t.id === route.params.transactionId);
-    if (mock) {
-      setTransaction({
-        id: mock.id,
-        user_id: 'mock-user',
-        amount: mock.amount,
-        type: mock.type,
-        category: { id: 'cat-1', name: mock.category, icon: mock.iconName, color: Colors.primary },
-        date: mock.date,
-        description: mock.merchant,
-        title: mock.merchant,
-        payment_method: mock.method,
-        notes: `${mock.category} payment via ${mock.method}`,
-        created_at: mock.date,
-        updated_at: mock.date,
-      } as any);
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const data = await api.get<Transaction>(API_ENDPOINTS.transaction(route.params.transactionId));
-      setTransaction(data);
-    } catch (err) {
-      if (MOCK_TRANSACTIONS.length > 0) {
-        const fallback = MOCK_TRANSACTIONS[0];
-        setTransaction({
-          id: fallback.id,
-          user_id: 'mock-user',
-          amount: fallback.amount,
-          type: fallback.type,
-          category: { id: 'cat-1', name: fallback.category, icon: fallback.iconName, color: Colors.primary },
-          date: fallback.date,
-          description: fallback.merchant,
-          title: fallback.merchant,
-          payment_method: fallback.method,
-          notes: `${fallback.category} payment via ${fallback.method}`,
-          created_at: fallback.date,
-          updated_at: fallback.date,
-        } as any);
-      } else {
-        navigation.goBack();
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleDelete = () => {
     Alert.alert(
@@ -130,27 +36,25 @@ export const TransactionDetailScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             setIsDeleting(true);
-            const idx = MOCK_TRANSACTIONS.findIndex(t => t.id === route.params.transactionId);
-            if (idx >= 0) {
-              MOCK_TRANSACTIONS.splice(idx, 1);
-            }
             try {
-              await api.delete(API_ENDPOINTS.transaction(route.params.transactionId));
-            } catch {
-              // local deletion done
+              await localStore.deleteTransaction(route.params.transactionId);
+              navigation.goBack();
+            } catch (e: any) {
+              Alert.alert('Could not delete transaction', e.message);
+              setIsDeleting(false);
             }
-            navigation.goBack();
           },
         },
       ]
     );
   };
 
-  if (isLoading || !transaction) {
+  if (!transaction) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.loadingContainer}>
-          <Text style={styles.loading}>Loading details...</Text>
+          <Text style={styles.loading}>This transaction no longer exists.</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()}><Text style={styles.loading}>Go back</Text></TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -182,18 +86,13 @@ export const TransactionDetailScreen: React.FC = () => {
         <View style={styles.heroCard}>
           <View style={[styles.categoryBadge, { backgroundColor: isIncome ? 'rgba(124,224,166,0.15)' : Palette.borderHairline }]}>
             <Ionicons
-              name={resolveCategoryIcon(
-                route.params.iconName,
-                transaction.category?.icon,
-                transaction.category?.name,
-                transaction.title || (transaction as any).description
-              )}
+              name={(transaction.category?.icon || 'receipt-outline') as any}
               size={32}
               color={isIncome ? Colors.income : Colors.text}
             />
           </View>
           <Text style={[styles.amount, { color: isIncome ? Colors.income : '#FFFFFF' }]}>
-            {isIncome ? '+' : '-'}{formatCurrency(transaction.amount)}
+            {isIncome ? '+' : '-'}{formatCurrency(transaction.amount, transaction.currency)}
           </Text>
           <Text style={styles.categoryName}>{transaction.category?.name || 'Uncategorized'}</Text>
           <View style={[styles.typeBadge, { backgroundColor: isIncome ? 'rgba(48,209,88,0.15)' : 'rgba(255,69,58,0.15)' }]}>
@@ -209,7 +108,7 @@ export const TransactionDetailScreen: React.FC = () => {
           <DetailRow icon="calendar-outline" label="Date" value={formatDateFull(transaction.date)} />
           <DetailRow icon="time-outline" label="Time" value={formatTime(transaction.date)} />
           {transaction.payment_method && (
-            <DetailRow icon="card-outline" label="Payment Method" value={getPaymentMethodLabel(transaction.payment_method)} />
+            <DetailRow icon="card-outline" label="Wallet" value={getPaymentMethodLabel(transaction.payment_method)} />
           )}
           {transaction.notes && (
             <DetailRow icon="information-circle-outline" label="Notes" value={transaction.notes} isLast />

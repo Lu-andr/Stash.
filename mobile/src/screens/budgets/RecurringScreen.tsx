@@ -8,16 +8,14 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
-import { api } from '../../services/api';
-import { API_ENDPOINTS } from '../../constants/api';
-import { RecurringExpense } from '../../types';
-import { formatCurrency } from '../../utils/formatting';
-import { MOCK_RECURRING_ITEMS, MockRecurringItem, formatIndian } from '../../data/mockData';
+import { localStore } from '../../data/repository';
+import { newId, periodEnd } from '../../data/domain';
+import { useLocalData, RecurringItem, formatMoney } from '../../data/localData';
 
 export const RecurringScreen: React.FC = () => {
   const navigation = useNavigation();
-  const [items, setItems] = useState<MockRecurringItem[]>(MOCK_RECURRING_ITEMS);
-  const [isLoading, setIsLoading] = useState(true);
+  const { LOCAL_RECURRING_ITEMS: items, state } = useLocalData();
+  const isLoading = false;
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Modal State
@@ -27,67 +25,19 @@ export const RecurringScreen: React.FC = () => {
   const [category, setCategory] = useState('Entertainment');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const loadData = useCallback(async () => {
-    try {
-      const recurringData = await api.get<RecurringExpense[]>(API_ENDPOINTS.recurring);
-      if (Array.isArray(recurringData) && recurringData.length > 0) {
-        setItems(
-          recurringData.map(r => ({
-            id: String(r.id),
-            name: r.name || 'Subscription',
-            amount: Number(r.amount) || 0,
-            frequency: r.frequency || 'monthly',
-            nextDate: r.next_payment_date ? r.next_payment_date.split('T')[0] : '2026-10-01',
-            category: r.category_name || 'General',
-            iconName: 'receipt-outline',
-            daysUntil: Number(r.days_until_due) || 7,
-          }))
-        );
-      }
-    } catch {
-      // Offline fallback: keep MOCK_RECURRING_ITEMS
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData();
-  }, [loadData]);
-
-  const onRefresh = async () => {
-    setIsRefreshing(true);
-    await loadData();
-    setIsRefreshing(false);
-  };
+  const onRefresh = async () => { setIsRefreshing(false); };
 
   const handleCreateRecurring = async () => {
-    const numAmount = parseFloat(amount);
-    if (!name.trim()) {
-      Alert.alert('Missing Name', 'Please specify a subscription name (e.g., Netflix, Gym).');
-      return;
-    }
-    if (!amount || isNaN(numAmount) || numAmount <= 0) {
-      Alert.alert('Invalid Amount', 'Please provide a valid recurring cost.');
-      return;
-    }
-
+    if (isSubmitting) return;
     setIsSubmitting(true);
-    const newItem: MockRecurringItem = {
-      id: `rec-${Date.now()}`,
-      name: name.trim(),
-      amount: numAmount,
-      frequency: 'monthly',
-      nextDate: '2026-10-15',
-      category: category,
-      iconName: category === 'Entertainment' ? 'tv-outline' : category === 'Health' ? 'barbell-outline' : 'receipt-outline',
-      daysUntil: 27,
-    };
-    setItems(prev => [newItem, ...prev]);
-    setModalVisible(false);
-    setName('');
-    setAmount('');
-    setIsSubmitting(false);
+    try {
+      const next = periodEnd(new Date(), 'monthly');
+      const newItem = { id: newId('recurring'), name: name.trim(), amount: Number(amount), frequency: 'monthly',
+        nextDate: next.toISOString(), category, iconName: 'repeat-outline', currency: state.settings.currency };
+      await localStore.updateCollection('recurring', prev => [newItem, ...prev]);
+      setModalVisible(false); setName(''); setAmount('');
+    } catch (e: any) { Alert.alert('Could not save recurring entry', e.message); }
+    finally { setIsSubmitting(false); }
   };
 
   const monthlyTotal = items.reduce((sum, r) => sum + (Number(r?.amount) || 0), 0);
@@ -150,7 +100,7 @@ export const RecurringScreen: React.FC = () => {
           <View style={styles.heroTop}>
             <View>
               <Text style={styles.heroLabel}>MONTHLY SUBSCRIPTIONS</Text>
-              <Text style={styles.heroAmount}>{formatIndian(monthlyTotal)}</Text>
+              <Text style={styles.heroAmount}>{formatMoney(monthlyTotal)}</Text>
             </View>
             <View style={styles.heroIconWrap}>
               <Ionicons name="repeat-outline" size={22} color={Colors.text} />
@@ -201,7 +151,7 @@ export const RecurringScreen: React.FC = () => {
                     <Text style={styles.itemCategory}>{item.category} · {item.frequency}</Text>
                   </View>
                   <View style={styles.itemAmountCol}>
-                    <Text style={styles.itemAmount}>{formatIndian(item.amount)}</Text>
+                    <Text style={styles.itemAmount}>{formatMoney(item.amount)}</Text>
                     <Text style={styles.itemFrequency}>/mo</Text>
                   </View>
                 </View>
@@ -212,7 +162,7 @@ export const RecurringScreen: React.FC = () => {
                   <View style={[styles.dueBadge, { backgroundColor: `${dueColor}18` }]}>
                     <Ionicons name="time-outline" size={13} color={dueColor} />
                     <Text style={[styles.dueText, { color: dueColor }]}>
-                      Due in {item.daysUntil} days · {item.nextDate}
+                      {item.daysUntil < 0 ? 'Overdue' : item.daysUntil === 0 ? 'Due today' : 'Due in ' + item.daysUntil + ' days'} · {new Date(item.nextDate).toLocaleDateString()}
                     </Text>
                   </View>
 
@@ -223,7 +173,7 @@ export const RecurringScreen: React.FC = () => {
                         {
                           text: 'Delete',
                           style: 'destructive',
-                          onPress: () => setItems(prev => prev.filter(r => r.id !== item.id)),
+                          onPress: () => { localStore.updateCollection('recurring', prev => prev.filter(r => r.id !== item.id)).catch(e => Alert.alert('Could not delete entry', e.message)); },
                         },
                       ]);
                     }}

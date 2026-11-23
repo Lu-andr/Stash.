@@ -10,7 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Palette, Radius } from '../../constants/theme';
 
-export type NavTab = 'home' | 'insights' | 'accounts';
+export type NavTab = 'home' | 'insights' | 'wallets';
 
 interface FloatingNavProps {
   activeTab: NavTab;
@@ -28,7 +28,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { tab: 'home',     icon: 'home-outline',      iconActive: 'home',      label: 'Home' },
   { tab: 'insights', icon: 'bar-chart-outline', iconActive: 'bar-chart', label: 'Insights' },
-  { tab: 'accounts', icon: 'layers-outline',    iconActive: 'layers',    label: 'Accounts' },
+  { tab: 'wallets', icon: 'layers-outline',    iconActive: 'layers',    label: 'Wallets' },
 ];
 
 export const FloatingNav: React.FC<FloatingNavProps> = ({

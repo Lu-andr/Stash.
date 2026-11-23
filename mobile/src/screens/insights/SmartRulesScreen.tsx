@@ -12,84 +12,21 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   Colors, Gradients, Typography, Spacing, Radius, Shadow,
 } from '../../constants/theme';
+import { localStore } from '../../data/repository';
+import { useLocalState } from '../../context/LocalDataContext';
+import { newId, type LocalRule } from '../../data/domain';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-interface SmartRule {
-  id: string;
-  keyword: string;
-  category: string;
-  categoryIcon: string;
-  enabled: boolean;
-  matchCount: number;
-}
-
-const INITIAL_RULES: SmartRule[] = [
-  {
-    id: 'rule-1',
-    keyword: 'Swiggy, Zomato, Starbucks',
-    category: 'Food',
-    categoryIcon: 'fast-food-outline',
-    enabled: true,
-    matchCount: 42,
-  },
-  {
-    id: 'rule-2',
-    keyword: 'Uber, Ola, Rapido, Metro',
-    category: 'Transport',
-    categoryIcon: 'car-outline',
-    enabled: true,
-    matchCount: 28,
-  },
-  {
-    id: 'rule-3',
-    keyword: 'Netflix, Spotify, Prime, YouTube',
-    category: 'Subscriptions',
-    categoryIcon: 'tv-outline',
-    enabled: true,
-    matchCount: 15,
-  },
-  {
-    id: 'rule-4',
-    keyword: 'Amazon, Flipkart, Myntra, Zara',
-    category: 'Shopping',
-    categoryIcon: 'bag-handle-outline',
-    enabled: true,
-    matchCount: 19,
-  },
-  {
-    id: 'rule-5',
-    keyword: 'Salary, Payroll, TechCorp',
-    category: 'Income',
-    categoryIcon: 'wallet-outline',
-    enabled: true,
-    matchCount: 6,
-  },
-  {
-    id: 'rule-6',
-    keyword: 'Electricity, Water, Wi-Fi, Airtel',
-    category: 'Bills',
-    categoryIcon: 'receipt-outline',
-    enabled: true,
-    matchCount: 8,
-  },
-];
-
-const RULE_CATEGORIES = [
-  { name: 'Food', icon: 'fast-food-outline' },
-  { name: 'Transport', icon: 'car-outline' },
-  { name: 'Subscriptions', icon: 'tv-outline' },
-  { name: 'Shopping', icon: 'bag-handle-outline' },
-  { name: 'Income', icon: 'wallet-outline' },
-  { name: 'Bills', icon: 'receipt-outline' },
-  { name: 'Entertainment', icon: 'film-outline' },
-  { name: 'Health', icon: 'heart-outline' },
-];
+type SmartRule = LocalRule;
 
 export const SmartRulesScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
-  const [rules, setRules] = useState<SmartRule[]>(INITIAL_RULES);
+  const state = useLocalState();
+  const rules = state.rules;
+  const RULE_CATEGORIES = state.categories.map(c => ({ name: c.label, icon: c.iconName }));
+  const setRules = (update: (items: SmartRule[]) => SmartRule[]) => localStore.updateCollection('rules', update).catch(e => Alert.alert('Could not save rule', e.message));
   const [modalVisible, setModalVisible] = useState(false);
   const [keywordInput, setKeywordInput] = useState('');
   const [selectedCat, setSelectedCat] = useState(RULE_CATEGORIES[0]);
@@ -112,14 +49,14 @@ export const SmartRulesScreen: React.FC = () => {
     ]);
   };
 
-  const handleAddRule = () => {
+  const handleAddRule = async () => {
     if (!keywordInput.trim()) {
       Alert.alert('Error', 'Please enter at least one merchant keyword.');
       return;
     }
 
     const newRule: SmartRule = {
-      id: `rule-${Date.now()}`,
+      id: newId('rule'),
       keyword: keywordInput.trim(),
       category: selectedCat.name,
       categoryIcon: selectedCat.icon,
@@ -127,7 +64,8 @@ export const SmartRulesScreen: React.FC = () => {
       matchCount: 0,
     };
 
-    setRules(prev => [newRule, ...prev]);
+    try { await localStore.updateCollection('rules', prev => [newRule, ...prev]); }
+    catch (e: any) { Alert.alert('Could not save rule', e.message); return; }
     setKeywordInput('');
     setModalVisible(false);
   };
@@ -302,7 +240,7 @@ export const SmartRulesScreen: React.FC = () => {
               <View style={styles.modalHeader}>
                 <View>
                   <Text style={styles.modalTitle}>New Smart Rule</Text>
-                  <Text style={styles.modalSubtitle}>Auto-categorize matching expenses</Text>
+                  <Text style={styles.modalSubtitle}>Categorize new entries marked Other</Text>
                 </View>
                 <TouchableOpacity
                   onPress={() => setModalVisible(false)}
@@ -321,12 +259,12 @@ export const SmartRulesScreen: React.FC = () => {
                     style={styles.textInput}
                     value={keywordInput}
                     onChangeText={setKeywordInput}
-                    placeholder="e.g. Swiggy, Zomato, Starbucks"
+                    placeholder="e.g. groceries, lunch, coffee"
                     placeholderTextColor={Colors.textMuted}
                     autoFocus
                   />
                   <Text style={styles.helperText}>
-                    Transactions containing any of these keywords will be tagged automatically.
+                    New entries marked Other can be categorized locally using these keywords.
                   </Text>
                 </View>
 

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Stash",
     "slug": "stash",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
@@ -13,20 +13,34 @@
     },
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "app.stash"
+      "bundleIdentifier": "app.stash",
+      "infoPlist": {
+        "RCTAsyncStorageExcludeFromBackup": true
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundColor": "#071426"
       },
-      "package": "app.stash"
+      "package": "app.stash",
+      "versionCode": 2,
+      "allowBackup": false,
+      "permissions": [],
+      "blockedPermissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "com.google.android.c2dm.permission.RECEIVE",
+        "android.permission.POST_NOTIFICATIONS"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store",
       "expo-font",
       [
         "expo-splash-screen",
@@ -42,8 +56,8 @@
         }
       ]
     ],
-    "extra": {
-      "apiBaseUrl": "http://localhost:8000"
+    "updates": {
+      "enabled": false
     }
   }
 }

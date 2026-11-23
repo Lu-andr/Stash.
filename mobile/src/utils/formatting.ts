@@ -1,32 +1,14 @@
-// Formatting utilities
-
-export const formatCurrency = (amount: number, currency = 'INR'): string => {
-  const absAmount = Math.abs(amount);
-  if (currency === 'INR') {
-    if (absAmount >= 10000000) {
-      return `₹${(absAmount / 10000000).toFixed(2)}Cr`;
-    }
-    if (absAmount >= 100000) {
-      return `₹${(absAmount / 100000).toFixed(2)}L`;
-    }
-    if (absAmount >= 1000) {
-      return `₹${absAmount.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-    }
-    return `₹${absAmount.toFixed(0)}`;
-  }
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0,
-  }).format(absAmount);
-};
-
-export const formatCurrencyFull = (amount: number, currency = 'INR'): string => {
-  return `₹${Math.abs(amount).toLocaleString('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-};
+import { localStore } from '../data/repository';
+import { CURRENCIES, type Currency } from '../data/domain';
+export function formatMoney(value: number | string | null | undefined, decimals = 2, currency: string = localStore.getSnapshot().settings.currency): string {
+  const amount = Number(value ?? 0);
+  const symbol = CURRENCIES.find(c => c.value === currency)?.symbol ?? currency + ' ';
+  const number = Number.isFinite(amount) ? amount : 0;
+  const formatted = Math.abs(number).toLocaleString(currency === 'INR' ? 'en-IN' : 'en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  return (number < 0 ? '−' : '') + symbol + formatted;
+}
+export const formatCurrency = (amount: number, currency?: string) => formatMoney(amount, 2, currency);
+export const formatCurrencyFull = (amount: number, currency?: string) => formatMoney(amount, 2, currency);
 
 export const formatDate = (dateStr: string): string => {
   const date = new Date(dateStr);
@@ -95,10 +77,6 @@ export const formatDaysUntil = (days: number): string => {
 export const getPaymentMethodLabel = (method?: string): string => {
   const methods: Record<string, string> = {
     cash: 'Cash',
-    upi: 'UPI',
-    credit_card: 'Credit Card',
-    debit_card: 'Debit Card',
-    bank_transfer: 'Bank Transfer',
     other: 'Other',
   };
   return methods[method || ''] || method || '';

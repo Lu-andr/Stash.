@@ -7,13 +7,14 @@ import { Ionicons } from '@expo/vector-icons';
 import {
   Colors, Gradients, Typography, Spacing, Radius, Shadow,
 } from '../../constants/theme';
-import { formatIndian, TransactionType } from '../../data/mockData';
+import { formatMoney, TransactionType } from '../../data/localData';
 
 interface TransactionRowProps {
   merchant: string;
   category: string;
   method: string;
   amount: number;
+  currency?: string;
   type: TransactionType;
   iconName?: keyof typeof Ionicons.glyphMap;
   onPress?: () => void;
@@ -24,6 +25,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({
   category,
   method,
   amount,
+  currency,
   type,
   iconName = 'receipt-outline',
   onPress,
@@ -32,7 +34,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({
   const brightnessAnim = useRef(new Animated.Value(1)).current;
 
   const isIncome = type === 'income';
-  const amountStr = `${isIncome ? '+' : '−'}${formatIndian(amount)}`;
+  const amountStr = `${isIncome ? '+' : '−'}${formatMoney(amount, 2, currency)}`;
   const amountColor = isIncome ? Colors.income : Colors.text;
 
   const handlePressIn = () => {

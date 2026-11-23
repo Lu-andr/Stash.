@@ -7,7 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
-import { AuthProvider } from './src/context/AuthContext';
+import { LocalDataProvider } from './src/context/LocalDataContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 
 const navigationTheme = {
@@ -49,12 +49,12 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <AuthProvider>
+      <LocalDataProvider>
         <NavigationContainer theme={navigationTheme}>
           <AppNavigator />
         </NavigationContainer>
         <StatusBar style="light" />
-      </AuthProvider>
+      </LocalDataProvider>
     </SafeAreaProvider>
   );
 }

@@ -1,277 +1,30 @@
-﻿<div align="center">
+# Stash — local personal tracker
+Stash records manually entered wallets, income, expenses, budget limits, recurring entries and savings goals on the device. It has no registration, server, bank connections, real payments, lending, cloud synchronization, telemetry or remote assistant.
 
-# Stash — AI-Powered Personal Finance
+## Run
+Use Node 22 and Java 21. In mobile:
+- npm ci
+- npm test
+- npm run check:offline
+- npx tsc --noEmit
+- npx expo prebuild --platform android --no-install
+- cd android && ./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a
 
-**Track. Budget. Grow. Understand your money with AI.**
+The release is standalone; it does not use a development server. Android Internet permissions and automatic backup are disabled. The iOS AsyncStorage backup exclusion is explicitly enabled.
 
-[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=flat-square&logo=fastapi)](https://fastapi.tiangolo.com)
-[![React Native](https://img.shields.io/badge/Mobile-React%20Native%20%2B%20Expo-61DAFB?style=flat-square&logo=react)](https://expo.dev)
-[![Gemini AI](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?style=flat-square&logo=google)](https://aistudio.google.com)
-[![TypeScript](https://img.shields.io/badge/Language-TypeScript-3178C6?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
-[![Python](https://img.shields.io/badge/Language-Python%203.11+-3776AB?style=flat-square&logo=python)](https://python.org)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
+## Local data
+AsyncStorage persists a versioned snapshot under stash.local.v1. Writes are serialized. The UI receives a new immutable snapshot only after a successful write. Failed reads do not overwrite existing data; failed writes leave existing data and UI unchanged.
 
-</div>
+New installations start with Cash, Main Wallet and Savings with zero balances, generic categories and an empty ledger. The previous prototype did not persist its sample ledger; fabricated sample balances and transactions are not imported.
 
----
+Wallets have only a name, generic type/icon, currency and initial balance. Their displayed balances are derived from recorded transactions. Editing or deleting an operation recalculates balances; currencies are never added together or converted. A wallet's currency cannot change while it has transactions. Deleting a wallet retains those transactions in history with their original currency; an edit then requires an active wallet of that currency.
 
-Stash is a **full-stack, production-quality personal finance app** built with FastAPI and React Native (Expo). It gives you complete visibility into your money — track every transaction, manage budgets, chase savings goals, monitor subscriptions, and get intelligent insights from a private AI assistant powered by Google Gemini.
+Reports, budget totals and category rules use locally recorded data. Category rules apply only to new entries marked Other. No exchange rates or personalized financial advice are provided. Settings, categories, budgets, rules, recurring entries and savings goals persist in the same local snapshot.
 
----
+Data is not synchronized or backed up by this app. Uninstalling or clearing application data removes these records. Treat device access and device backups according to the platform's own settings. The app does not promise encryption or biometric locking.
 
-## Features
+## Google Play
+Describe actual manual tracking functionality accurately in the listing, privacy policy, Data safety and Financial features declarations. Offline storage and neutral wording do not exempt an app from Google's declarations or guarantee approval.
 
-| Feature | Description |
-|---|---|
-| 🔐 **Auth** | JWT + refresh tokens, bcrypt password hashing |
-| 💸 **Transactions** | Income & expense tracking with categories, payment methods, notes |
-| 📊 **Insights** | Donut charts, spending trends, month-over-month comparisons |
-| 💰 **Budgets** | Category budgets with real-time utilization tracking |
-| 🎯 **Savings Goals** | Goal tracking with progress bars and quick contributions |
-| 🔄 **Recurring Expenses** | Subscription management with upcoming payment alerts |
-| 🤖 **Stash AI** | Private AI chat powered by Gemini with your real financial data |
-| 📱 **Dark UI** | Sleek dark-mode mobile app with glassmorphism and micro-animations |
-| 📥 **CSV Export** | Download all your transactions as a CSV |
-| 🔒 **Data Isolation** | Every query is scoped strictly to the authenticated user |
-
----
-
-## Project Structure
-
-```
-Stash/
-├── backend/                        # Python · FastAPI
-│   ├── app/
-│   │   ├── api/endpoints/          # auth · transactions · budgets · finance
-│   │   │                           # dashboard · ai · profile · insights
-│   │   ├── core/
-│   │   │   ├── config.py           # Pydantic settings (reads .env)
-│   │   │   └── security.py         # JWT · bcrypt
-│   │   ├── db/database.py          # SQLAlchemy engine + session
-│   │   ├── models/                 # ORM models (User, Transaction, Budget...)
-│   │   ├── schemas/                # Pydantic request/response schemas
-│   │   └── services/
-│   │       ├── analytics.py        # Pandas-powered financial calculations
-│   │       └── ai_service.py       # Gemini AI abstraction layer
-│   ├── alembic/                    # Database migrations
-│   ├── tests/                      # Pytest suite
-│   ├── seed.py                     # Demo data seeder
-│   ├── requirements.txt
-│   └── .env.example
-│
-├── mobile/                         # TypeScript · React Native · Expo
-│   ├── src/
-│   │   ├── components/             # Button · Input · EmptyState · Skeleton
-│   │   ├── constants/
-│   │   │   ├── api.ts              # Base URL + all API endpoints
-│   │   │   └── theme.ts            # Colors · typography · spacing
-│   │   ├── context/AuthContext.tsx
-│   │   ├── hooks/                  # useDashboard · useTransactions
-│   │   ├── navigation/             # Stack + bottom-tab navigator
-│   │   ├── screens/
-│   │   │   ├── auth/               # Login · Register · Forgot Password
-│   │   │   ├── onboarding/         # 4-slide intro
-│   │   │   ├── home/               # Dashboard
-│   │   │   ├── transactions/       # List · Detail · Add/Edit
-│   │   │   ├── budgets/            # Budgets · Goals · Recurring
-│   │   │   ├── insights/           # Charts & analytics
-│   │   │   ├── ai/                 # Stash AI chat
-│   │   │   └── profile/            # Account · Settings · Export
-│   │   ├── services/api.ts         # HTTP client with auto token-refresh
-│   │   ├── types/index.ts          # TypeScript type definitions
-│   │   └── utils/formatting.ts     # Currency · date · INR formatters
-│   └── App.tsx
-│
-└── docker-compose.yml              # PostgreSQL + Redis (optional)
-```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-| Tool | Version |
-|---|---|
-| Python | 3.11+ |
-| Node.js | 18+ |
-| Expo Go | Installed on your phone |
-| Docker Desktop | Optional (SQLite works without it) |
-
----
-
-### 1. Clone the repo
-
-`ash
-git clone https://github.com/mayankbohara0-dev/Stash.git
-cd Stash
-`
-
----
-
-### 2. Set up the Backend
-
-`ash
-cd backend
-
-# Create and activate a virtual environment
-python -m venv venv
-venv\Scripts\activate       # Windows
-source venv/bin/activate    # macOS / Linux
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Copy and configure environment variables
-copy .env.example .env      # Windows
-cp .env.example .env        # macOS / Linux
-`
-
-Edit ackend/.env and set your values:
-
-`env
-GEMINI_API_KEY=your_gemini_api_key_here   # https://aistudio.google.com
-SECRET_KEY=any_long_random_string
-DATABASE_URL=sqlite:///./moneymate.db
-AI_PROVIDER=gemini
-AI_MODEL=gemini-2.5-flash
-`
-
-Run migrations and (optionally) seed demo data:
-
-`ash
-alembic upgrade head
-python seed.py   # optional — loads demo user + sample transactions
-`
-
-Start the API server:
-
-`ash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-`
-
-- Swagger docs: http://localhost:8000/docs
-- Health check: http://localhost:8000/health
-
----
-
-### 3. Set up the Mobile App
-
-`ash
-cd mobile
-npm install
-`
-
-Open mobile/src/constants/api.ts and update the backend URL:
-
-`	s
-// If your phone and PC are on the same WiFi, use your PC's local IP
-export const API_BASE_URL = 'http://YOUR_LOCAL_IP:8000';
-
-// For Android emulator
-export const API_BASE_URL = 'http://10.0.2.2:8000';
-`
-
-> Tip: Find your local IP with ipconfig (Windows) or ifconfig (macOS/Linux).
-
-Start Expo:
-
-`ash
-npx expo start --lan
-`
-
-Scan the QR code with **Expo Go** on your phone.
-
----
-
-### 4. Demo Credentials
-
-After running python seed.py:
-
-| | |
-|---|---|
-| **Email** | demo@moneymate.app |
-| **Password** | Demo@1234 |
-
----
-
-## Stash AI
-
-Stash AI is a private financial assistant powered by **Google Gemini**. It has read-only access to your structured financial data and can answer questions like:
-
-- *"Where did most of my money go this month?"*
-- *"What is my savings rate compared to last month?"*
-- *"How close am I to my vacation savings goal?"*
-- *"What subscriptions am I paying for?"*
-
-**Security model:**
-- The AI never touches raw database queries
-- It receives only a curated FinancialContext object — no passwords, tokens, or other users' data
-- Rate-limited to 10 requests per user per minute
-- Read-only — it cannot create, modify, or delete anything
-
----
-
-## Security
-
-- Passwords hashed with **bcrypt**
-- Short-lived JWT access tokens (30 min) + long-lived refresh tokens (30 days)
-- Every database query filtered by user_id — strict data isolation
-- API key lives only in .env (gitignored) — never in source code
-- User messages sanitized and length-limited before reaching the AI
-
----
-
-## Environment Variables
-
-| Variable | Required | Description |
-|---|---|---|
-| DATABASE_URL | Yes | SQLite or PostgreSQL connection string |
-| SECRET_KEY | Yes | JWT signing key — keep secret |
-| GEMINI_API_KEY | Yes (for AI) | Google Gemini API key |
-| AI_PROVIDER | No | gemini or openai (default: gemini) |
-| AI_MODEL | No | Model name (default: gemini-2.5-flash) |
-| DEBUG | No | true enables Swagger /docs |
-| CORS_ORIGINS | No | Comma-separated allowed origins |
-
----
-
-## Tech Stack
-
-### Backend
-| Tool | Purpose |
-|---|---|
-| FastAPI | Async Python web framework |
-| SQLAlchemy | ORM |
-| Alembic | Database migrations |
-| Pydantic | Request/response validation |
-| Pandas | Financial data calculations |
-| bcrypt + python-jose | Auth & security |
-| httpx | Async HTTP (Gemini API calls) |
-
-### Mobile
-| Tool | Purpose |
-|---|---|
-| React Native + Expo | Cross-platform mobile |
-| TypeScript | Type safety |
-| React Navigation | Stack + bottom tabs |
-| react-native-gifted-charts | Bar + donut charts |
-| expo-linear-gradient | UI gradients |
-| AsyncStorage | Token persistence |
-
----
-
-## Running Tests
-
-`ash
-cd backend
-pytest tests/ -v
-`
-
-Covers: auth flows, transaction CRUD, user data isolation, budgets, savings goals, and edge cases.
-
----
-
-## License
-
-MIT — for personal and educational use. Stash is not a licensed financial advisor.
+## Validation
+The Android workflow runs offline storage integration tests, source checks, TypeScript compilation, native generation and a release APK build. It also inspects the merged release manifest for network permissions and backup settings. Device UI testing should be reported separately from these automated checks.

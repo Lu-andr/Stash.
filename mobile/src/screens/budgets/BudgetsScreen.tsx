@@ -10,60 +10,26 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
-import { api } from '../../services/api';
-import { API_ENDPOINTS } from '../../constants/api';
-import { Budget } from '../../types';
-import { formatCurrency } from '../../utils/formatting';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { MOCK_BUDGET_ITEMS, MockBudgetCategory, formatIndian } from '../../data/mockData';
+import { useLocalData, formatMoney } from '../../data/localData';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export const BudgetsScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
-  const [budgets, setBudgets] = useState<Budget[]>([]);
-  const [mockItems, setMockItems] = useState<MockBudgetCategory[]>(MOCK_BUDGET_ITEMS);
+  const { LOCAL_BUDGET_ITEMS, LOCAL_TOTAL_BUDGET, LOCAL_TOTAL_SPENT } = useLocalData();
+  const budgetItems = LOCAL_BUDGET_ITEMS;
   const [activeFilter, setActiveFilter] = useState<'all' | 'overspent' | 'ontrack'>('all');
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = false;
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const load = useCallback(async () => {
-    try {
-      const data = await api.get<Budget[]>(API_ENDPOINTS.budgets);
-      if (Array.isArray(data) && data.length > 0) {
-        setBudgets(data);
-      }
-    } catch {
-      // Offline fallback: keep mockItems
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  const onRefresh = async () => {
-    setIsRefreshing(true);
-    await load();
-    setIsRefreshing(false);
-  };
-
-  // Compute totals from mockItems if no API budgets
-  const totalBudget = budgets.length > 0
-    ? budgets.reduce((s, b) => s + (Number(b?.total_amount) || 0), 0)
-    : mockItems.reduce((s, b) => s + (Number(b?.limit) || 0), 0);
-
-  const totalSpent = budgets.length > 0
-    ? budgets.reduce((s, b) => s + (Number(b?.total_spent) || 0), 0)
-    : mockItems.reduce((s, b) => s + (Number(b?.spent) || 0), 0);
-
+  const onRefresh = async () => { setIsRefreshing(false); };
+  const totalBudget = LOCAL_TOTAL_BUDGET;
+  const totalSpent = LOCAL_TOTAL_SPENT;
   const totalRemaining = Math.max(totalBudget - totalSpent, 0);
   const overallPct = totalBudget > 0 ? Math.min((totalSpent / totalBudget) * 100, 100) : 0;
   const overallColor = overallPct >= 100 ? Colors.expense : overallPct >= 80 ? Colors.warning : Colors.income;
 
-  const filteredItems = mockItems.filter(item => {
+  const filteredItems = budgetItems.filter(item => {
     if (activeFilter === 'overspent') return item.isOverspent;
     if (activeFilter === 'ontrack') return !item.isOverspent;
     return true;
@@ -131,7 +97,7 @@ export const BudgetsScreen: React.FC = () => {
           <View style={styles.summaryTop}>
             <View>
               <Text style={styles.summaryLabel}>Monthly Budget</Text>
-              <Text style={styles.summaryTotal}>{formatIndian(totalBudget)}</Text>
+              <Text style={styles.summaryTotal}>{formatMoney(totalBudget)}</Text>
             </View>
             <View
               style={[
@@ -167,14 +133,14 @@ export const BudgetsScreen: React.FC = () => {
             <View>
               <Text style={styles.summaryStatLabel}>Total Spent</Text>
               <Text style={[styles.summaryStatVal, { color: Colors.expense }]}>
-                {formatIndian(totalSpent)}
+                {formatMoney(totalSpent)}
               </Text>
             </View>
             <View style={styles.summaryDivider} />
             <View>
               <Text style={styles.summaryStatLabel}>Remaining Safe</Text>
               <Text style={[styles.summaryStatVal, { color: Colors.income }]}>
-                {formatIndian(Math.max(totalRemaining, 0))}
+                {formatMoney(Math.max(totalRemaining, 0))}
               </Text>
             </View>
           </View>
@@ -193,7 +159,7 @@ export const BudgetsScreen: React.FC = () => {
                 activeFilter === 'all' && styles.filterPillTextActive,
               ]}
             >
-              All ({mockItems.length})
+              All ({budgetItems.length})
             </Text>
           </TouchableOpacity>
 
@@ -286,15 +252,15 @@ export const BudgetsScreen: React.FC = () => {
 
                 {/* Bottom line */}
                 <View style={styles.budgetCardBottom}>
-                  <Text style={styles.budgetSpent}>{formatIndian(item.spent)}</Text>
-                  <Text style={styles.budgetOf}>of {formatIndian(item.limit)}</Text>
+                  <Text style={styles.budgetSpent}>{formatMoney(item.spent)}</Text>
+                  <Text style={styles.budgetOf}>of {formatMoney(item.limit)}</Text>
                   {isOver ? (
                     <Text style={[styles.budgetRemain, { color: Colors.expense }]}>
-                      +₹{(item.spent - item.limit).toLocaleString('en-IN')} over
+                      {formatMoney(item.spent - item.limit)} over
                     </Text>
                   ) : (
                     <Text style={[styles.budgetRemain, { color: Colors.income }]}>
-                      ₹{remaining.toLocaleString('en-IN')} left
+                      {formatMoney(remaining)} left
                     </Text>
                   )}
                 </View>

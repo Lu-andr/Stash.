@@ -17,8 +17,7 @@ import { SectionHeader } from '../../components/ui/SectionHeader';
 import { TransactionRow } from '../../components/ui/TransactionRow';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { MOCK_TRANSACTIONS, MOCK_BALANCE, MOCK_SAFE_TO_SPEND, formatIndian } from '../../data/mockData';
-import { useAuth } from '../../context/AuthContext';
+import { useLocalData, formatMoney } from '../../data/localData';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
@@ -29,7 +28,7 @@ function BalanceDisplay({ value }: { value: number }) {
 
   useEffect(() => {
     const listener = animValue.addListener(({ value: v }) => {
-      setDisplayText(formatIndian(v));
+      setDisplayText(formatMoney(v));
     });
     Animated.timing(animValue, {
       toValue: value,
@@ -44,23 +43,22 @@ function BalanceDisplay({ value }: { value: number }) {
 
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
-  const { logout } = useAuth();
+  const { LOCAL_TRANSACTIONS, LOCAL_BALANCE, state } = useLocalData();
   const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [searchText, setSearchText] = useState('');
-  const [transactions, setTransactions] = useState(MOCK_TRANSACTIONS);
+  const transactions = LOCAL_TRANSACTIONS;
   const [menuVisible, setMenuVisible] = useState(false);
   const [filterType, setFilterType] = useState<'all' | 'expense' | 'income'>('all');
 
   useFocusEffect(
     useCallback(() => {
       setActiveTab('home');
-      setTransactions([...MOCK_TRANSACTIONS]);
     }, [])
   );
 
   // Stagger animation for rows
   const rowAnims = useRef(
-    MOCK_TRANSACTIONS.map(() => ({
+    LOCAL_TRANSACTIONS.map(() => ({
       opacity: new Animated.Value(0),
       translateY: new Animated.Value(20),
     }))
@@ -82,8 +80,8 @@ export const HomeScreen: React.FC = () => {
     setActiveTab(tab);
     if (tab === 'insights') {
       navigation.navigate('Insights' as any);
-    } else if (tab === 'accounts') {
-      navigation.navigate('Accounts' as any);
+    } else if (tab === 'wallets') {
+      navigation.navigate('Wallets' as any);
     }
   };
 
@@ -101,7 +99,7 @@ export const HomeScreen: React.FC = () => {
       t.merchant.toLowerCase().includes(searchText.toLowerCase()) ||
       t.category.toLowerCase().includes(searchText.toLowerCase());
     const matchesFilter = filterType === 'all' || t.type === filterType;
-    return matchesSearch && matchesFilter;
+    return matchesSearch && matchesFilter && new Date(t.date).toDateString() === new Date().toDateString();
   });
 
   return (
@@ -161,10 +159,10 @@ export const HomeScreen: React.FC = () => {
           {/* ── FeaturedPill: Balance (tappable -> Accounts) ── */}
           <View style={styles.section}>
             <FeaturedPill
-              title={`Balance ${formatIndian(MOCK_BALANCE)}`}
-              subtitle={`${formatIndian(MOCK_SAFE_TO_SPEND, 0)} safe to spend today`}
+              title={`Balance ${formatMoney(LOCAL_BALANCE)}`}
+              subtitle={`Manual balances · ${state.settings.currency}`}
               iconName="wallet-outline"
-              onPress={() => navigation.navigate('Accounts' as any)}
+              onPress={() => navigation.navigate('Wallets' as any)}
             />
           </View>
 
@@ -192,6 +190,7 @@ export const HomeScreen: React.FC = () => {
                   category={txn.category}
                   method={txn.method}
                   amount={txn.amount}
+                  currency={txn.currency}
                   type={txn.type}
                   iconName={txn.iconName as any}
                   onPress={() =>
@@ -253,9 +252,7 @@ export const HomeScreen: React.FC = () => {
                 { label: 'Budgets & Planning', icon: 'pie-chart-outline', route: 'Budgets' },
                 { label: 'Savings Goals',      icon: 'flag-outline',      route: 'SavingsGoals' },
                 { label: 'Recurring Bills',    icon: 'repeat-outline',    route: 'Recurring' },
-                { label: 'AI Assistant',       icon: 'sparkles-outline',  route: 'AIAssistant' },
-                { label: 'Linked Accounts',    icon: 'layers-outline',    route: 'Accounts' },
-                { label: 'Profile',            icon: 'person-outline',    route: 'Profile' },
+                { label: 'Wallets',    icon: 'layers-outline',    route: 'Wallets' },
                 { label: 'Settings',           icon: 'settings-outline',  route: 'Settings' },
               ].map(item => (
                 <TouchableOpacity
@@ -275,19 +272,6 @@ export const HomeScreen: React.FC = () => {
                 </TouchableOpacity>
               ))}
 
-              <TouchableOpacity
-                style={[styles.menuRow, styles.logoutRow]}
-                activeOpacity={0.7}
-                onPress={() => {
-                  setMenuVisible(false);
-                  logout();
-                }}
-              >
-                <View style={[styles.menuRowIconWrap, { backgroundColor: 'rgba(255,122,114,0.15)' }]}>
-                  <Ionicons name="log-out-outline" size={18} color={Colors.danger} />
-                </View>
-                <Text style={[styles.menuRowText, { color: Colors.danger }]}>Sign Out</Text>
-              </TouchableOpacity>
             </ScrollView>
           </View>
         </TouchableOpacity>
@@ -457,12 +441,5 @@ const styles = StyleSheet.create({
     fontSize: Typography.sm,
     fontWeight: Typography.medium,
     color: Colors.text,
-  },
-  logoutRow: {
-    marginTop: Spacing.xs,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
-    paddingTop: Spacing.sm,
-    marginBottom: Spacing.xs,
   },
 });

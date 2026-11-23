@@ -15,12 +15,13 @@ import { InsightRow } from '../../components/ui/InsightRow';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
 import { RootStackParamList } from '../../navigation/AppNavigator';
-import { MOCK_INSIGHTS, MOCK_BUDGET_USED_PCT } from '../../data/mockData';
+import { useLocalData } from '../../data/localData';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 export const InsightsScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
+  const { LOCAL_INSIGHTS, LOCAL_BUDGET_USED_PCT, state } = useLocalData();
   const [activeTab, setActiveTab] = useState<NavTab>('insights');
 
   useFocusEffect(
@@ -30,7 +31,7 @@ export const InsightsScreen: React.FC = () => {
   );
 
   const rowAnims = useRef(
-    MOCK_INSIGHTS.map(() => ({
+    LOCAL_INSIGHTS.map(() => ({
       opacity: new Animated.Value(0),
       translateY: new Animated.Value(20),
     }))
@@ -54,15 +55,15 @@ export const InsightsScreen: React.FC = () => {
   const handleTabPress = (tab: NavTab) => {
     setActiveTab(tab);
     if (tab === 'home') navigation.navigate('Home' as any);
-    else if (tab === 'accounts') navigation.navigate('Accounts' as any);
+    else if (tab === 'wallets') navigation.navigate('Wallets' as any);
   };
 
   const routes: Record<string, keyof RootStackParamList> = {
     'ins-1': 'Budgets',
     'ins-2': 'Recurring',
     'ins-3': 'Transactions',
-    'ins-4': 'Accounts',
-    'ins-5': 'Transactions',
+    'ins-4': 'Wallets',
+    'ins-5': 'SavingsGoals',
   };
 
   return (
@@ -96,12 +97,10 @@ export const InsightsScreen: React.FC = () => {
 
           {/* 1. HeroInfoCard */}
           <HeroInfoCard
-            title="Budget Alerts"
-            body="Get notified before you overspend on food, travel or shopping."
-            pillLabel="Enable"
-            onPillPress={() =>
-              Alert.alert('Budget Alerts Enabled', 'You will now receive notifications before approaching category limits.')
-            }
+            title="Local budget overview"
+            body={state.settings.budgetWarnings ? 'Review limits and recorded spending on this device.' : 'Budget warnings are hidden. Your recorded budgets remain available.'}
+            pillLabel="Review"
+            onPillPress={() => navigation.navigate('Budgets')}
           />
 
           {/* 2. FeaturedPill: Smart Rules */}
@@ -116,14 +115,14 @@ export const InsightsScreen: React.FC = () => {
           <View style={styles.budgetHealthBlock}>
             <View style={styles.labelRow}>
               <Text style={styles.labelTitle}>Budget Health</Text>
-              <Text style={styles.labelPct}>{MOCK_BUDGET_USED_PCT}% used</Text>
+              <Text style={styles.labelPct}>{LOCAL_BUDGET_USED_PCT}% used</Text>
             </View>
-            <ProgressBar value={MOCK_BUDGET_USED_PCT} animated />
+            <ProgressBar value={LOCAL_BUDGET_USED_PCT} animated />
           </View>
 
           {/* 4. Exactly 5 InsightRows */}
           <View style={styles.insightList}>
-            {MOCK_INSIGHTS.map((item, i) => (
+            {LOCAL_INSIGHTS.map((item, i) => (
               <Animated.View
                 key={item.id}
                 style={{

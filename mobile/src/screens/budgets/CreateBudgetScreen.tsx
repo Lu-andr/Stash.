@@ -7,9 +7,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
-import { api } from '../../services/api';
-import { API_ENDPOINTS } from '../../constants/api';
-import { Category } from '../../types';
+import { localStore } from '../../data/repository';
+import { useLocalState } from '../../context/LocalDataContext';
+import { newId } from '../../data/domain';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -28,30 +28,11 @@ export const CreateBudgetScreen: React.FC = () => {
   const [totalAmount, setTotalAmount] = useState('');
   const [period, setPeriod] = useState<'monthly' | 'weekly' | 'yearly'>('monthly');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const state = useLocalState();
+  const categories = state.categories.filter(c => c.id !== 'cat-7').map(c => ({ id: c.id, name: c.label, icon: c.iconName, color: Colors.primary }));
   const [categoryBudgets, setCategoryBudgets] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isRecurring, setIsRecurring] = useState(true);
-
-  const DEFAULT_CATEGORIES: Category[] = [
-    { id: 'cat-1', name: 'Food & Dining', icon: 'fast-food-outline', color: Palette.silverTop, type: 'expense', is_default: true },
-    { id: 'cat-2', name: 'Transport', icon: 'car-outline', color: Palette.silverTop, type: 'expense', is_default: true },
-    { id: 'cat-3', name: 'Shopping', icon: 'bag-handle-outline', color: Palette.silverTop, type: 'expense', is_default: true },
-    { id: 'cat-4', name: 'Entertainment', icon: 'tv-outline', color: Palette.silverTop, type: 'expense', is_default: true },
-    { id: 'cat-5', name: 'Bills & Utilities', icon: 'receipt-outline', color: Palette.silverTop, type: 'expense', is_default: true },
-    { id: 'cat-6', name: 'Health', icon: 'medkit-outline', color: Palette.silverTop, type: 'expense', is_default: true },
-  ];
-
-  useEffect(() => {
-    api.get<Category[]>(API_ENDPOINTS.categories)
-      .then(cats => {
-        const expenseCats = cats.filter(c => c.type === 'expense');
-        setCategories(expenseCats.length > 0 ? expenseCats : DEFAULT_CATEGORIES);
-      })
-      .catch(() => {
-        setCategories(DEFAULT_CATEGORIES);
-      });
-  }, []);
 
   const handleSave = async () => {
     const numAmount = parseFloat(totalAmount);
@@ -70,14 +51,13 @@ export const CreateBudgetScreen: React.FC = () => {
       .map(([category_id, amount]) => ({ category_id, amount: parseFloat(amount) }));
 
     try {
-      await api.post(API_ENDPOINTS.budgets, {
-        name: name.trim(),
-        total_amount: numAmount,
-        period,
-        start_date: new Date(startDate).toISOString(),
-        is_recurring: isRecurring,
-        categories: categoryEntries,
-      });
+      const parts = startDate.split('-').map(Number);
+      const start = new Date(parts[0], parts[1] - 1, parts[2]);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate) || start.getFullYear() !== parts[0] || start.getMonth() !== parts[1] - 1 || start.getDate() !== parts[2]) throw new Error('Enter a valid start date as YYYY-MM-DD.');
+      await localStore.updateCollection('budgets', prev => [...prev, {
+        id: newId('budget'), name: name.trim(), totalAmount: numAmount, currency: state.settings.currency,
+        period, startDate: start.toISOString(), isRecurring, categories: categoryEntries,
+      }]);
       navigation.goBack();
     } catch (err: any) {
       Alert.alert('Error', err.message || 'Failed to create budget');

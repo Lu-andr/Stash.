@@ -8,11 +8,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
-import { api } from '../../services/api';
-import { API_ENDPOINTS } from '../../constants/api';
-import { SavingsGoal } from '../../types';
-import { formatCurrency } from '../../utils/formatting';
-import { MOCK_SAVINGS_GOALS, MockSavingsGoal, formatIndian } from '../../data/mockData';
+import { localStore } from '../../data/repository';
+import { newId, periodEnd } from '../../data/domain';
+import { useLocalData, GoalItem, formatMoney } from '../../data/localData';
 
 const GOAL_ICON_OPTIONS: Array<{ icon: keyof typeof Ionicons.glyphMap; label: string }> = [
   { icon: 'shield-checkmark-outline', label: 'Safety' },
@@ -27,8 +25,8 @@ const GOAL_ICON_OPTIONS: Array<{ icon: keyof typeof Ionicons.glyphMap; label: st
 
 export const SavingsGoalsScreen: React.FC = () => {
   const navigation = useNavigation();
-  const [goals, setGoals] = useState<MockSavingsGoal[]>(MOCK_SAVINGS_GOALS);
-  const [isLoading, setIsLoading] = useState(true);
+  const { LOCAL_SAVINGS_GOALS: goals, state } = useLocalData();
+  const isLoading = false;
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
   const [name, setName] = useState('');
@@ -37,57 +35,19 @@ export const SavingsGoalsScreen: React.FC = () => {
   const [selectedIcon, setSelectedIcon] = useState<keyof typeof Ionicons.glyphMap>('shield-checkmark-outline');
   const [isSaving, setIsSaving] = useState(false);
 
-  const load = useCallback(async () => {
-    try {
-      const data = await api.get<SavingsGoal[]>(API_ENDPOINTS.goals);
-      if (Array.isArray(data) && data.length > 0) {
-        setGoals(
-          data.map(g => ({
-            id: String(g.id),
-            name: g.name || 'Goal',
-            targetAmount: Number((g as any).target_amount ?? (g as any).targetAmount) || 0,
-            currentAmount: Number((g as any).current_amount ?? (g as any).currentAmount) || 0,
-            targetDate: g.target_date || '2026-12-31',
-            iconName: 'flag-outline',
-          }))
-        );
-      }
-    } catch {
-      // Offline fallback: keep MOCK_SAVINGS_GOALS
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  const onRefresh = async () => {
-    setIsRefreshing(true);
-    await load();
-    setIsRefreshing(false);
-  };
+  const onRefresh = async () => { setIsRefreshing(false); };
 
   const handleAddGoal = async () => {
-    const target = parseFloat(targetAmount);
-    if (!name.trim() || isNaN(target) || target <= 0) {
-      Alert.alert('Required', 'Please enter a goal name and valid target amount.');
-      return;
-    }
+    if (isSaving) return;
     setIsSaving(true);
-    const newGoal: MockSavingsGoal = {
-      id: `goal-${Date.now()}`,
-      name: name.trim(),
-      targetAmount: target,
-      currentAmount: parseFloat(currentAmount || '0') || 0,
-      targetDate: '2027-01-01',
-      iconName: selectedIcon,
-    };
-    setGoals(prev => [newGoal, ...prev]);
-    setShowAdd(false);
-    setName('');
-    setTargetAmount('');
-    setCurrentAmount('');
-    setIsSaving(false);
+    try {
+      const goal = { id: newId('goal'), name: name.trim(), targetAmount: Number(targetAmount),
+        currentAmount: Number(currentAmount || '0'), targetDate: periodEnd(new Date(), 'yearly').toISOString(),
+        iconName: selectedIcon, currency: state.settings.currency };
+      await localStore.updateCollection('goals', prev => [goal, ...prev]);
+      setShowAdd(false); setName(''); setTargetAmount(''); setCurrentAmount('');
+    } catch (e: any) { Alert.alert('Could not save goal', e.message); }
+    finally { setIsSaving(false); }
   };
 
   const handleDelete = (id: string) => {
@@ -96,7 +56,7 @@ export const SavingsGoalsScreen: React.FC = () => {
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => setGoals(prev => prev.filter(g => g.id !== id)),
+        onPress: () => { localStore.updateCollection('goals', prev => prev.filter(g => g.id !== id)).catch(e => Alert.alert('Could not delete goal', e.message)); },
       },
     ]);
   };
@@ -151,13 +111,13 @@ export const SavingsGoalsScreen: React.FC = () => {
             <View style={styles.summaryCol}>
               <Text style={styles.summaryLabel}>Total Saved</Text>
               <Text style={[styles.summaryValue, { color: Colors.income }]}>
-                {formatIndian(totalSaved)}
+                {formatMoney(totalSaved)}
               </Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryCol}>
               <Text style={styles.summaryLabel}>Total Target</Text>
-              <Text style={styles.summaryValue}>{formatIndian(totalTarget)}</Text>
+              <Text style={styles.summaryValue}>{formatMoney(totalTarget)}</Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryCol}>
@@ -201,7 +161,7 @@ export const SavingsGoalsScreen: React.FC = () => {
                   <View>
                     <Text style={styles.goalAmountLabel}>Saved</Text>
                     <Text style={[styles.goalAmountVal, { color: Colors.income }]}>
-                      {formatIndian(goal.currentAmount)}
+                      {formatMoney(goal.currentAmount)}
                     </Text>
                   </View>
                   <View style={styles.pctBadge}>
@@ -218,7 +178,7 @@ export const SavingsGoalsScreen: React.FC = () => {
                   <Text style={styles.goalRemain}>
                     {remaining > 0 ? `₹${remaining.toLocaleString('en-IN')} to go` : 'Goal Reached! 🎉'}
                   </Text>
-                  <Text style={styles.goalTarget}>Target: {formatIndian(goal.targetAmount)}</Text>
+                  <Text style={styles.goalTarget}>Target: {formatMoney(goal.targetAmount)}</Text>
                 </View>
               </LinearGradient>
             );

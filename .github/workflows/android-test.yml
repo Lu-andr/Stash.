@@ -2,7 +2,7 @@ name: Android test APK
 
 on:
   push:
-    branches: [master]
+    branches: [master, offline-local]
     paths:
       - 'mobile/**'
       - '.github/workflows/android-test.yml'
@@ -26,11 +26,16 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-36 build-tools;36.0.0'
           log-accepted-android-sdk-licenses: false
       - run: npm ci --no-audit --no-fund
+        working-directory: mobile
+      - run: npm test
+        working-directory: mobile
+      - run: npm run check:offline
         working-directory: mobile
       - run: npx tsc --noEmit
         working-directory: mobile
@@ -42,10 +47,26 @@ jobs:
         working-directory: mobile/android
         env:
           NODE_ENV: production
-      - run: cp mobile/android/app/build/outputs/apk/release/app-release.apk Stash-navy-1.0.0-test-arm64.apk
+      - name: Verify merged offline release manifest
+        working-directory: mobile
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import xml.etree.ElementTree as ET
+          candidates = list(Path('android/app/build/intermediates/merged_manifests').rglob('AndroidManifest.xml'))
+          assert candidates, 'Merged manifest was not generated'
+          key = '{http://schemas.android.com/apk/res/android}'
+          for file in candidates:
+              root = ET.parse(file).getroot()
+              permissions = {p.get(key+'name') for p in root.findall('uses-permission')}
+              assert not {'android.permission.INTERNET', 'android.permission.ACCESS_NETWORK_STATE'} & permissions
+              assert root.find('application').get(key+'allowBackup') == 'false'
+          print('Release manifest has no network access or automatic backup')
+          PY
+      - run: cp mobile/android/app/build/outputs/apk/release/app-release.apk Stash-offline-1.1.0-test-arm64.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: Stash-navy-test-arm64
-          path: Stash-navy-1.0.0-test-arm64.apk
+          name: Stash-offline-test-arm64
+          path: Stash-offline-1.1.0-test-arm64.apk
           if-no-files-found: error
           retention-days: 30

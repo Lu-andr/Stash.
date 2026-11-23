@@ -1,16 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, StyleSheet, StatusBar, ScrollView,
-  Animated,
+  Animated, Alert, TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import type { RootStackParamList } from '../../navigation/AppNavigator';
 
 import { Palette, Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
 import { PrimaryButton } from '../../components/ui/PrimaryButton';
-import { MOCK_CATEGORIES, addMockTransaction } from '../../data/mockData';
+import { useLocalData } from '../../data/localData';
+import { localStore } from '../../data/repository';
+import { CURRENCIES } from '../../data/domain';
 
 const KEYPAD = [
   ['1', '2', '3'],
@@ -53,9 +56,20 @@ function GlossyKey({ label, onPress }: { label: string; onPress: () => void }) {
 
 export const AddTransactionScreen: React.FC = () => {
   const navigation = useNavigation();
-  const [amount, setAmount] = useState('0');
-  const [selectedCategory, setSelectedCategory] = useState('cat-1');
-  const [type, setType] = useState<'expense' | 'income'>('expense');
+  const route = useRoute<RouteProp<RootStackParamList, 'AddTransaction'>>();
+  const { state, LOCAL_CATEGORIES } = useLocalData();
+  const id = route.params?.transactionId;
+  const current = state.transactions.find(t => t.id === id);
+  const eligibleWallets = state.wallets.filter(w => !current || w.currency === current.currency);
+  const [walletId, setWalletId] = useState(current?.walletId ?? eligibleWallets[0]?.id ?? '');
+  const [amount, setAmount] = useState(current ? String(current.amount) : '0');
+  const [selectedCategory, setSelectedCategory] = useState(current?.categoryId ?? 'cat-8');
+  const [type, setType] = useState<'expense' | 'income'>(current?.type ?? route.params?.type ?? 'expense');
+  const [merchant, setMerchant] = useState(current?.merchant ?? '');
+  const [notes, setNotes] = useState(current?.notes ?? '');
+  const localDay = (d: Date) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  const [dateInput, setDateInput] = useState(localDay(current ? new Date(current.date) : new Date()));
+  const [saving, setSaving] = useState(false);
 
   const slideAnim = useRef(new Animated.Value(40)).current;
   const fadeAnim  = useRef(new Animated.Value(0)).current;
@@ -81,22 +95,24 @@ export const AddTransactionScreen: React.FC = () => {
     }
   };
 
-  const handleSave = () => {
-    const num = parseFloat(amount) || 0;
-    if (num > 0) {
-      const cat = MOCK_CATEGORIES.find(c => c.id === selectedCategory);
-      addMockTransaction({
-        merchant: cat?.label || (type === 'income' ? 'Salary' : 'General Expense'),
-        category: cat?.label || 'General',
-        amount: num,
-        type: type,
-        iconName: cat?.iconName || 'wallet-outline',
-      });
+  const handleSave = async () => {
+    if (saving) return;
+    const parts = dateInput.split('-').map(Number);
+    const selectedDate = new Date(parts[0], parts[1] - 1, parts[2], 12);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(dateInput) || localDay(selectedDate) !== dateInput) {
+      Alert.alert('Invalid date', 'Enter a valid date as YYYY-MM-DD.'); return;
     }
-    navigation.goBack();
+    setSaving(true);
+    try {
+      const date = current && localDay(new Date(current.date)) === dateInput ? current.date :
+        dateInput === localDay(new Date()) ? new Date().toISOString() : selectedDate.toISOString();
+      await localStore.saveTransaction({ merchant, notes, amount: Number(amount), type, categoryId: selectedCategory, walletId, date }, id);
+      navigation.goBack();
+    } catch (e: any) { Alert.alert('Could not save transaction', e.message); }
+    finally { setSaving(false); }
   };
-
-  const displayAmount = `₹${amount}`;
+  const currency = state.wallets.find(w => w.id === walletId)?.currency ?? current?.currency ?? state.settings.currency;
+  const displayAmount = (CURRENCIES.find(c => c.value === currency)?.symbol ?? currency) + amount;
 
   return (
     <View style={styles.root}>
@@ -113,6 +129,7 @@ export const AddTransactionScreen: React.FC = () => {
             {/* Top highlight */}
             <View style={styles.topHighlight} />
 
+            <ScrollView contentContainerStyle={{ flexGrow: 1, paddingBottom: Spacing.base }} keyboardShouldPersistTaps="handled">
             {/* Header */}
             <View style={styles.header}>
               <TouchableOpacity
@@ -123,7 +140,7 @@ export const AddTransactionScreen: React.FC = () => {
               >
                 <Ionicons name="close" size={20} color={Colors.textSecondary} />
               </TouchableOpacity>
-              <Text style={styles.headerTitle}>Add Transaction</Text>
+              <Text style={styles.headerTitle}>{id ? 'Edit Transaction' : 'Add Transaction'}</Text>
 
               {/* Type toggle */}
               <View style={styles.typeToggle}>
@@ -155,6 +172,22 @@ export const AddTransactionScreen: React.FC = () => {
               </Text>
             </View>
 
+            <View style={{ paddingHorizontal: Spacing.lg, gap: Spacing.sm, marginBottom: Spacing.base }}>
+              <TextInput accessibilityLabel="Transaction description" value={merchant} onChangeText={setMerchant} maxLength={120}
+                placeholder="Description (e.g. groceries)" placeholderTextColor={Colors.textMuted} style={{ color: Colors.text, backgroundColor: Colors.bgInset, padding: 12, borderRadius: Radius.md }} />
+              <TextInput accessibilityLabel="Transaction date" value={dateInput} onChangeText={setDateInput} maxLength={10}
+                placeholder="YYYY-MM-DD" placeholderTextColor={Colors.textMuted} style={{ color: Colors.text, backgroundColor: Colors.bgInset, padding: 12, borderRadius: Radius.md }} />
+              <TextInput accessibilityLabel="Transaction notes" value={notes} onChangeText={setNotes} maxLength={500}
+                placeholder="Notes (optional)" placeholderTextColor={Colors.textMuted} style={{ color: Colors.text, backgroundColor: Colors.bgInset, padding: 12, borderRadius: Radius.md }} />
+              <Text style={{ color: Colors.textSecondary }}>Wallet</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: Spacing.sm }}>
+                {eligibleWallets.map(w => <TouchableOpacity key={w.id} onPress={() => setWalletId(w.id)} accessibilityLabel={'Use wallet ' + w.name}
+                  style={{ padding: 12, borderRadius: Radius.full, backgroundColor: walletId === w.id ? Colors.surfaceHigh : Colors.surface }}>
+                  <Text style={{ color: Colors.text }}>{w.name} · {w.currency}</Text>
+                </TouchableOpacity>)}
+              </ScrollView>
+              {!eligibleWallets.length && <Text style={{ color: Colors.warning }}>Create a wallet in the required currency before saving a transaction.</Text>}
+            </View>
             {/* Category chips */}
             <View style={styles.categoryWrap}>
               <ScrollView
@@ -163,7 +196,7 @@ export const AddTransactionScreen: React.FC = () => {
                 contentContainerStyle={styles.categoryRow}
                 style={styles.categoryScroll}
               >
-                {MOCK_CATEGORIES.map(cat => {
+                {LOCAL_CATEGORIES.map(cat => {
                   const isSelected = selectedCategory === cat.id;
                   return (
                     <TouchableOpacity
@@ -214,10 +247,12 @@ export const AddTransactionScreen: React.FC = () => {
             {/* Save button */}
             <View style={styles.saveWrapper}>
               <PrimaryButton
-                label="Save Transaction"
+                label={saving ? "Saving…" : id ? "Save Changes" : "Save Transaction"}
+                disabled={saving || !eligibleWallets.length}
                 onPress={handleSave}
               />
             </View>
+            </ScrollView>
           </LinearGradient>
         </Animated.View>
       </SafeAreaView>

@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../navigation/AppNavigator';
@@ -13,16 +13,14 @@ import { Palette,
   Colors, Gradients, Typography, Spacing, Radius, Shadow,
 } from '../../constants/theme';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
-import { MOCK_ACCOUNTS, formatIndian } from '../../data/mockData';
+import { formatMoney } from '../../utils/formatting';
+import { useLocalState } from '../../context/LocalDataContext';
+import { localStore } from '../../data/repository';
+import { WALLET_TYPES, walletBalance, type Wallet } from '../../data/domain';
 
-const TYPE_LABELS = {
-  savings: 'Savings',
-  current: 'Current',
-  credit:  'Credit Card',
-  wallet:  'Wallet',
-};
+const TYPE_LABELS = Object.fromEntries(WALLET_TYPES.map(t => [t.value, t.label]));
 
-function AccountCard({ account }: { account: typeof MOCK_ACCOUNTS[number] }) {
+function WalletCard({ account, onEdit, onDelete }: { account: Wallet & { balance: number; iconName: string }; onEdit: () => void; onDelete: () => void }) {
   const isNegative = account.balance < 0;
 
   return (
@@ -36,16 +34,15 @@ function AccountCard({ account }: { account: typeof MOCK_ACCOUNTS[number] }) {
 
       {/* Top row */}
       <View style={styles.cardTopRow}>
-        <View style={styles.bankIconWrap}>
-          <Ionicons name={account.iconName as any} size={20} color={Colors.text} />
+        <View style={styles.walletIconWrap}>
+          {account.type === 'savings' ? <FontAwesome5 name="piggy-bank" size={20} color={Colors.text} /> : <Ionicons name={account.iconName as any} size={20} color={Colors.text} />}
         </View>
-        <View style={styles.bankInfo}>
-          <Text style={styles.bankName}>{account.name}</Text>
-          <Text style={styles.bankInstitution}>{account.institution}</Text>
+        <View style={styles.walletInfo}>
+          <Text style={styles.walletName}>{account.name}</Text>
+          <Text style={styles.walletMeta}>{account.currency + ' · Manual entry'}</Text>
         </View>
-        {account.last4 ? (
-          <Text style={styles.last4}>·· {account.last4}</Text>
-        ) : null}
+        <TouchableOpacity onPress={onEdit} accessibilityLabel={'Edit wallet ' + account.name} style={{ padding: 10 }}><Ionicons name="pencil-outline" size={18} color={Colors.textSecondary} /></TouchableOpacity>
+        <TouchableOpacity onPress={onDelete} accessibilityLabel={'Delete wallet ' + account.name} style={{ padding: 10 }}><Ionicons name="trash-outline" size={18} color={Colors.danger} /></TouchableOpacity>
       </View>
 
       {/* Balance */}
@@ -58,7 +55,7 @@ function AccountCard({ account }: { account: typeof MOCK_ACCOUNTS[number] }) {
               isNegative && { color: Colors.danger },
             ]}
           >
-            {isNegative ? '−' : ''}{formatIndian(Math.abs(account.balance))}
+            {isNegative ? '−' : ''}{formatMoney(Math.abs(account.balance), 2, account.currency)}
           </Text>
         </View>
 
@@ -73,17 +70,23 @@ function AccountCard({ account }: { account: typeof MOCK_ACCOUNTS[number] }) {
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-export const AccountsScreen: React.FC = () => {
+export const WalletsScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
-  const [activeTab, setActiveTab] = useState<NavTab>('accounts');
+  const [activeTab, setActiveTab] = useState<NavTab>('wallets');
 
   useFocusEffect(
     useCallback(() => {
-      setActiveTab('accounts');
+      setActiveTab('wallets');
     }, [])
   );
 
-  const totalBalance = MOCK_ACCOUNTS.reduce((acc, a) => acc + a.balance, 0);
+  const state = useLocalState();
+  const wallets = state.wallets.map(w => ({ ...w, balance: walletBalance(state, w), iconName: WALLET_TYPES.find(t => t.value === w.type)?.icon || 'wallet-outline' }));
+  const currencies = [...new Set(wallets.map(w => w.currency))];
+  const removeWallet = (id: string) => Alert.alert('Delete wallet?', 'Recorded transactions will remain in your history. This removes only this manual wallet.', [
+    { text: 'Cancel', style: 'cancel' },
+    { text: 'Delete', style: 'destructive', onPress: () => { localStore.deleteWallet(id).catch(e => Alert.alert('Could not delete wallet', e.message)); } },
+  ]);
 
   return (
     <View style={styles.root}>
@@ -100,8 +103,8 @@ export const AccountsScreen: React.FC = () => {
             <Ionicons name="chevron-back" size={20} color={Colors.textSecondary} />
           </TouchableOpacity>
           <View>
-            <Text style={styles.headerTitle}>Accounts</Text>
-            <Text style={styles.headerSub}>{MOCK_ACCOUNTS.length} linked accounts</Text>
+            <Text style={styles.headerTitle}>Wallets</Text>
+            <Text style={styles.headerSub}>{wallets.length} active wallets</Text>
           </View>
         </View>
 
@@ -118,26 +121,25 @@ export const AccountsScreen: React.FC = () => {
             style={styles.netWorthCard}
           >
             <View style={styles.topHighlight} />
-            <Text style={styles.netWorthLabel}>Net Worth</Text>
-            <Text style={styles.netWorthAmount}>{formatIndian(totalBalance)}</Text>
-            <Text style={styles.netWorthSub}>Across all linked accounts</Text>
+            <Text style={styles.netWorthLabel}>Recorded balances</Text>
+            {currencies.length ? currencies.map(currency => <Text key={currency} style={styles.netWorthAmount}>
+              {formatMoney(wallets.filter(w => w.currency === currency).reduce((sum, w) => sum + w.balance, 0), 2, currency)}
+            </Text>) : <Text style={styles.netWorthAmount}>No wallets yet</Text>}
+            <Text style={styles.netWorthSub}>Manual totals by currency · No conversion</Text>
           </LinearGradient>
 
           {/* Account cards — stacked */}
           <View style={styles.cardList}>
-            {MOCK_ACCOUNTS.map(acc => (
-              <AccountCard key={acc.id} account={acc} />
-            ))}
+            {wallets.map(wallet => <WalletCard key={wallet.id} account={wallet}
+              onEdit={() => navigation.navigate('WalletForm', { walletId: wallet.id })}
+              onDelete={() => removeWallet(wallet.id)} />)}
           </View>
 
           {/* Add account button */}
           <TouchableOpacity
             style={styles.addAccountBtn}
             activeOpacity={0.8}
-            onPress={() => Alert.alert('Link Financial Account', 'Select your bank or payment app to securely link it with Stash.', [
-              { text: 'Cancel', style: 'cancel' },
-              { text: 'Connect Bank', onPress: () => {} },
-            ])}
+            onPress={() => navigation.navigate('WalletForm')}
           >
             <LinearGradient
               colors={Gradients.raised}
@@ -149,7 +151,7 @@ export const AccountsScreen: React.FC = () => {
               <View style={styles.addAccountIcon}>
                 <Ionicons name="add" size={20} color={Colors.textSecondary} />
               </View>
-              <Text style={styles.addAccountText}>Add Account</Text>
+              <Text style={styles.addAccountText}>Add Wallet</Text>
               <Ionicons name="chevron-forward" size={16} color={Colors.textMuted} />
             </LinearGradient>
           </TouchableOpacity>
@@ -203,15 +205,14 @@ const styles = StyleSheet.create({
     padding: Spacing.xl, overflow: 'hidden', ...Shadow.sm,
   },
   cardTopRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, marginBottom: Spacing.xl },
-  bankIconWrap: {
+  walletIconWrap: {
     width: 44, height: 44, borderRadius: 22,
     backgroundColor: Colors.surfaceAlt, borderWidth: 1, borderColor: Colors.border,
     alignItems: 'center', justifyContent: 'center',
   },
-  bankInfo: { flex: 1 },
-  bankName: { fontSize: Typography.md, fontWeight: Typography.semibold, color: Colors.text },
-  bankInstitution: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
-  last4: { fontSize: Typography.base, color: Colors.textMuted, fontVariant: ['tabular-nums'] },
+  walletInfo: { flex: 1 },
+  walletName: { fontSize: Typography.md, fontWeight: Typography.semibold, color: Colors.text },
+  walletMeta: { fontSize: 12, color: Colors.textSecondary, marginTop: 2 },
 
   balanceRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between' },
   balanceLabel: { fontSize: 11, fontWeight: Typography.medium, color: Colors.textMuted, marginBottom: 4, letterSpacing: 0.5 },

@@ -99,7 +99,7 @@ export const TransactionsScreen: React.FC = () => {
           </View>
           <View style={styles.txnRight}>
             <Text style={[styles.txnAmount, { color: isIncome ? Colors.income : Colors.text }]}>
-              {isIncome ? '+' : '-'}{formatCurrency(item.amount)}
+              {isIncome ? '+' : '-'}{formatCurrency(item.amount, item.currency)}
             </Text>
             <Text style={styles.txnDate}>{formatDate(item.date)}</Text>
           </View>

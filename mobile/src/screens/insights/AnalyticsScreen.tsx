@@ -15,13 +15,7 @@ import { Palette,
   Colors, Gradients, Typography, Spacing, Radius, Shadow,
 } from '../../constants/theme';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
-import {
-  MOCK_ANALYTICS_MONTHS,
-  MOCK_ANALYTICS_CURRENT_MONTH,
-  MOCK_CATEGORY_BREAKDOWN,
-  MOCK_WEEKLY_TREND,
-  formatIndian,
-} from '../../data/mockData';
+import { useLocalData, formatMoney } from '../../data/localData';
 
 const { width } = Dimensions.get('window');
 const SIDE_PAD = Spacing.lg;
@@ -107,7 +101,7 @@ const CategoryRow = ({
         </View>
       </View>
       <View style={catRow.right}>
-        <Text style={catRow.amount}>{formatIndian(amount)}</Text>
+        <Text style={catRow.amount}>{formatMoney(amount)}</Text>
         <Text style={catRow.pct}>{pct.toFixed(0)}%</Text>
       </View>
     </View>
@@ -143,13 +137,14 @@ const catRow = StyleSheet.create({
 // -- Main Screen -------------------------------------------------------------
 export const AnalyticsScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
+  const { LOCAL_ANALYTICS_MONTHS, LOCAL_ANALYTICS_CURRENT_MONTH, LOCAL_CATEGORY_BREAKDOWN, LOCAL_INCOME_BREAKDOWN, LOCAL_WEEKLY_TREND, state } = useLocalData();
   const [activeTab] = useState<NavTab>('insights');
-  const [selectedMonth, setSelectedMonth] = useState(MOCK_ANALYTICS_CURRENT_MONTH);
+  const [selectedMonth, setSelectedMonth] = useState(LOCAL_ANALYTICS_CURRENT_MONTH);
   const [viewMode, setViewMode] = useState<ViewMode>('expense');
 
-  const selectedData = MOCK_ANALYTICS_MONTHS.find(m => m.label === selectedMonth);
-  const idx = MOCK_ANALYTICS_MONTHS.findIndex(m => m.label === selectedMonth);
-  const prevData = idx > 0 ? MOCK_ANALYTICS_MONTHS[idx - 1] : null;
+  const selectedData = LOCAL_ANALYTICS_MONTHS.find(m => m.label === selectedMonth);
+  const idx = LOCAL_ANALYTICS_MONTHS.findIndex(m => m.label === selectedMonth);
+  const prevData = idx > 0 ? LOCAL_ANALYTICS_MONTHS[idx - 1] : null;
 
   const currentAmount = viewMode === 'expense'
     ? (selectedData?.amount ?? 0)
@@ -163,16 +158,16 @@ export const AnalyticsScreen: React.FC = () => {
   const isUp = pctChange >= 0;
   const net = (selectedData?.income ?? 0) - (selectedData?.amount ?? 0);
 
-  const categories = MOCK_CATEGORY_BREAKDOWN[selectedMonth] ?? [];
+  const categories = LOCAL_CATEGORY_BREAKDOWN[selectedMonth] ?? [];
   const totalCatSpend = categories.reduce((s, c) => s + c.amount, 0);
 
-  const maxVal = Math.max(...MOCK_ANALYTICS_MONTHS.map(m =>
+  const maxVal = Math.max(1, ...LOCAL_ANALYTICS_MONTHS.map(m =>
     viewMode === 'expense' ? m.amount : m.income
   ));
-  const barWidth = (CHART_W - (MOCK_ANALYTICS_MONTHS.length - 1) * BAR_GAP) / MOCK_ANALYTICS_MONTHS.length;
+  const barWidth = (CHART_W - (LOCAL_ANALYTICS_MONTHS.length - 1) * BAR_GAP) / LOCAL_ANALYTICS_MONTHS.length;
 
-  const weekMax = Math.max(...MOCK_WEEKLY_TREND.map(d => d.amount));
-  const weekBarW = (CHART_W - (MOCK_WEEKLY_TREND.length - 1) * BAR_GAP) / MOCK_WEEKLY_TREND.length;
+  const weekMax = Math.max(1, ...LOCAL_WEEKLY_TREND.map(d => d.amount));
+  const weekBarW = (CHART_W - (LOCAL_WEEKLY_TREND.length - 1) * BAR_GAP) / LOCAL_WEEKLY_TREND.length;
   const WEEK_H = 70;
   const dayIndex = new Date().getDay();
   const todayLabel = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayIndex];
@@ -201,9 +196,10 @@ export const AnalyticsScreen: React.FC = () => {
           <TouchableOpacity
             style={styles.shareBtn}
             activeOpacity={0.8}
-            onPress={() => Alert.alert('Report Exported', 'Detailed spending analysis report has been saved to downloads.')}
+            accessibilityLabel="About local analysis"
+            onPress={() => Alert.alert('Local analysis', 'Calculated from your manual entries in ' + state.settings.currency + '. Other currencies are kept separate. No currency conversion is performed.')}
           >
-            <Ionicons name="share-outline" size={18} color={Colors.text} />
+            <Ionicons name="information-circle-outline" size={18} color={Colors.text} />
           </TouchableOpacity>
         </View>
 
@@ -235,7 +231,7 @@ export const AnalyticsScreen: React.FC = () => {
           <View style={styles.statsRow}>
             <StatCard
               label={viewMode === 'expense' ? 'Total Spent' : 'Total Earned'}
-              value={formatIndian(currentAmount, 0)}
+              value={formatMoney(currentAmount, 0)}
               valueColor={viewMode === 'expense' ? Colors.expense : Colors.income}
               icon={viewMode === 'expense' ? 'arrow-up-circle-outline' : 'arrow-down-circle-outline'}
             />
@@ -247,7 +243,7 @@ export const AnalyticsScreen: React.FC = () => {
             />
             <StatCard
               label="Net Savings"
-              value={formatIndian(Math.abs(net), 0)}
+              value={formatMoney(net, 0)}
               valueColor={net >= 0 ? Colors.income : Colors.expense}
               icon="wallet-outline"
             />
@@ -258,8 +254,8 @@ export const AnalyticsScreen: React.FC = () => {
             <View style={styles.topHighlight} />
             <View style={styles.chartHeader}>
               <View>
-                <Text style={styles.chartLabel}>{selectedMonth} 2026</Text>
-                <Text style={styles.chartAmount}>{formatIndian(currentAmount)}</Text>
+                <Text style={styles.chartLabel}>{selectedMonth} {selectedData?.year}</Text>
+                <Text style={styles.chartAmount}>{formatMoney(currentAmount)}</Text>
               </View>
               <View style={[styles.trendBadge, { backgroundColor: expenseBg }]}>
                 <Ionicons name={isUp ? 'trending-up-outline' : 'trending-down-outline'} size={13} color={expenseColor} />
@@ -271,7 +267,7 @@ export const AnalyticsScreen: React.FC = () => {
 
             {/* Interactive Month Selector Pills */}
             <View style={styles.monthPillsRow}>
-              {MOCK_ANALYTICS_MONTHS.map(m => {
+              {LOCAL_ANALYTICS_MONTHS.map(m => {
                 const isSel = m.label === selectedMonth;
                 return (
                   <TouchableOpacity
@@ -293,9 +289,9 @@ export const AnalyticsScreen: React.FC = () => {
                 <Line key={r} x1={0} y1={BAR_H * (1 - r)} x2={CHART_W} y2={BAR_H * (1 - r)}
                   stroke="rgba(255,255,255,0.05)" strokeWidth={1} />
               ))}
-              {MOCK_ANALYTICS_MONTHS.map((m, i) => {
+              {LOCAL_ANALYTICS_MONTHS.map((m, i) => {
                 const val = viewMode === 'expense' ? m.amount : m.income;
-                const bh = Math.max(4, (val / maxVal) * BAR_H);
+                const bh = (val / maxVal) * BAR_H;
                 const x = i * (barWidth + BAR_GAP);
                 const y = BAR_H - bh;
                 const isSel = m.label === selectedMonth;
@@ -322,7 +318,7 @@ export const AnalyticsScreen: React.FC = () => {
               <View style={styles.topHighlight} />
               <View style={styles.sectionHeaderRow}>
                 <Text style={styles.sectionTitle}>Spending Breakdown</Text>
-                <Text style={styles.sectionSub}>{selectedMonth} 2026</Text>
+                <Text style={styles.sectionSub}>{selectedMonth} {selectedData?.year}</Text>
               </View>
               <View style={styles.catList}>
                 {categories.map((cat, i) => (
@@ -346,20 +342,15 @@ export const AnalyticsScreen: React.FC = () => {
               <View style={styles.topHighlight} />
               <View style={styles.sectionHeaderRow}>
                 <Text style={styles.sectionTitle}>Income Sources</Text>
-                <Text style={styles.sectionSub}>{selectedMonth} 2026</Text>
+                <Text style={styles.sectionSub}>{selectedMonth} {selectedData?.year}</Text>
               </View>
               <View style={styles.catList}>
-                {[
-                  { name: 'Salary',       amount: 75000, iconName: 'briefcase-outline',        color: Palette.silverTop, pct: 88 },
-                  { name: 'Freelance',    amount: 8000,  iconName: 'laptop-outline',            color: Palette.chartSoft, pct: 9  },
-                  { name: 'Investments',  amount: 2000,  iconName: 'trending-up-outline',       color: Palette.chartMid, pct: 2  },
-                  { name: 'Other',        amount: 0,     iconName: 'ellipsis-horizontal-outline', color: Palette.chartMuted, pct: 0 },
-                ].map((src, i) => (
+                {(LOCAL_INCOME_BREAKDOWN[selectedMonth] ?? []).map((src, i) => (
                   <CategoryRow
                     key={src.name}
                     name={src.name}
                     amount={src.amount}
-                    total={85000}
+                    total={selectedData?.income ?? 0}
                     iconName={src.iconName}
                     barColor={src.color}
                     index={i}
@@ -380,8 +371,8 @@ export const AnalyticsScreen: React.FC = () => {
               </View>
             </View>
             <Svg width={CHART_W} height={WEEK_H + 20} style={{ marginTop: 8 }}>
-              {MOCK_WEEKLY_TREND.map((d, i) => {
-                const bh = Math.max(4, (d.amount / weekMax) * WEEK_H);
+              {LOCAL_WEEKLY_TREND.map((d, i) => {
+                const bh = (d.amount / weekMax) * WEEK_H;
                 const x = i * (weekBarW + BAR_GAP);
                 const y = WEEK_H - bh;
                 const isToday = d.day === todayLabel;
@@ -401,11 +392,11 @@ export const AnalyticsScreen: React.FC = () => {
             </Svg>
             <View style={styles.weekTotalsRow}>
               {[
-                { label: 'This week', val: formatIndian(MOCK_WEEKLY_TREND.reduce((s, d) => s + d.amount, 0), 0), color: Colors.expense },
+                { label: 'This week', val: formatMoney(LOCAL_WEEKLY_TREND.reduce((s, d) => s + d.amount, 0), 0), color: Colors.expense },
                 null,
-                { label: 'Daily avg', val: formatIndian(Math.round(MOCK_WEEKLY_TREND.reduce((s, d) => s + d.amount, 0) / 7), 0), color: Colors.text },
+                { label: 'Daily avg', val: formatMoney(Math.round(LOCAL_WEEKLY_TREND.reduce((s, d) => s + d.amount, 0) / 7), 0), color: Colors.text },
                 null,
-                { label: 'Peak day', val: MOCK_WEEKLY_TREND.reduce((a, b) => a.amount > b.amount ? a : b).day, color: Colors.warning },
+                { label: 'Peak day', val: LOCAL_WEEKLY_TREND.reduce((a, b) => a.amount > b.amount ? a : b).day, color: Colors.warning },
               ].map((item, i) =>
                 item === null
                   ? <View key={i} style={styles.weekTotalDivider} />
@@ -423,7 +414,7 @@ export const AnalyticsScreen: React.FC = () => {
           <LinearGradient colors={Gradients.raised} start={{ x: 0, y: 0 }} end={{ x: 0, y: 1 }} style={styles.sectionCard}>
             <View style={styles.topHighlight} />
             <Text style={styles.sectionTitle}>Income vs Expenses</Text>
-            <Text style={styles.sectionSub2}>{selectedMonth} 2026</Text>
+            <Text style={styles.sectionSub2}>{selectedMonth} {selectedData?.year}</Text>
 
             <View style={styles.ivsRow}>
               <View style={styles.ivsLabel}>
@@ -432,10 +423,10 @@ export const AnalyticsScreen: React.FC = () => {
               </View>
               <View style={styles.ivsBarWrap}>
                 <View style={styles.ivsBarTrack}>
-                  <View style={[styles.ivsBarFill, { width: '100%', backgroundColor: Colors.income }]} />
+                  <View style={[styles.ivsBarFill, { width: (selectedData?.income ?? 0) > 0 ? '100%' : '0%', backgroundColor: Colors.income }]} />
                 </View>
                 <Text style={[styles.ivsAmt, { color: Colors.income }]}>
-                  {formatIndian(selectedData?.income ?? 0, 0)}
+                  {formatMoney(selectedData?.income ?? 0, 0)}
                 </Text>
               </View>
             </View>
@@ -450,13 +441,13 @@ export const AnalyticsScreen: React.FC = () => {
                   <View style={[
                     styles.ivsBarFill,
                     {
-                      width: `${Math.min(((selectedData?.amount ?? 0) / (selectedData?.income ?? 1)) * 100, 100)}%` as any,
+                      width: `${Math.min(((selectedData?.amount ?? 0) / Math.max(selectedData?.income ?? 0, 1)) * 100, 100)}%` as any,
                       backgroundColor: Colors.expense,
                     }
                   ]} />
                 </View>
                 <Text style={[styles.ivsAmt, { color: Colors.expense }]}>
-                  {formatIndian(selectedData?.amount ?? 0, 0)}
+                  {formatMoney(selectedData?.amount ?? 0, 0)}
                 </Text>
               </View>
             </View>
@@ -465,13 +456,13 @@ export const AnalyticsScreen: React.FC = () => {
               <View>
                 <Text style={styles.savingsRateLabel}>Savings Rate</Text>
                 <Text style={styles.savingsRateSub}>
-                  {formatIndian(net, 0)} saved this month
+                  {formatMoney(net, 0)} saved this month
                 </Text>
               </View>
               <View style={styles.savingsRateBadge}>
                 <Text style={styles.savingsRateVal}>
                   {net >= 0
-                    ? `${((net / (selectedData?.income ?? 1)) * 100).toFixed(0)}%`
+                    ? `${((net / Math.max(selectedData?.income ?? 0, 1)) * 100).toFixed(0)}%`
                     : '0%'}
                 </Text>
               </View>
@@ -485,9 +476,9 @@ export const AnalyticsScreen: React.FC = () => {
       <FloatingNav
         activeTab={activeTab}
         onTabPress={(tab) => {
-          if (tab === 'home') navigation.navigate('Main' as any, { screen: 'Home' });
-          else if (tab === 'insights') navigation.navigate('Main' as any, { screen: 'Insights' });
-          else if (tab === 'accounts') navigation.navigate('Accounts' as any);
+          if (tab === 'home') navigation.navigate('Home' as any);
+          else if (tab === 'insights') navigation.navigate('Insights' as any);
+          else if (tab === 'wallets') navigation.navigate('Wallets' as any);
         }}
         onAddPress={() => navigation.navigate('AddTransaction' as any, {})}
       />
