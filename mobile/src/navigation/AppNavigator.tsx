@@ -1,7 +1,7 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import type { NavigatorScreenParams } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator, type BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { CompositeNavigationProp, NavigatorScreenParams } from '@react-navigation/native';
+import { createNativeStackNavigator, type NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Colors } from '../constants/theme';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { InsightsScreen } from '../screens/insights/InsightsScreen';
@@ -17,7 +17,7 @@ import { RecurringScreen } from '../screens/budgets/RecurringScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
 import { AnalyticsScreen } from '../screens/insights/AnalyticsScreen';
 import { SmartRulesScreen } from '../screens/insights/SmartRulesScreen';
-type MainTabParamList = { Home: undefined; Insights: undefined; Wallets: undefined };
+export type MainTabParamList = { Home: undefined; Insights: undefined; Wallets: undefined };
 export type RootStackParamList = {
   Main: NavigatorScreenParams<MainTabParamList> | undefined;
   WalletForm: { walletId?: string } | undefined;
@@ -27,6 +27,7 @@ export type RootStackParamList = {
   SavingsGoals: undefined; Recurring: undefined; Settings: undefined;
   Analytics: undefined; SmartRules: undefined;
 };
+export type DashboardNavigation = CompositeNavigationProp<BottomTabNavigationProp<MainTabParamList>, NativeStackNavigationProp<RootStackParamList>>;
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 function MainTabs() {

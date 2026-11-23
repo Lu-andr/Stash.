@@ -14,10 +14,10 @@ import { FeaturedPill } from '../../components/ui/FeaturedPill';
 import { InsightRow } from '../../components/ui/InsightRow';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
-import { RootStackParamList } from '../../navigation/AppNavigator';
+import { RootStackParamList, DashboardNavigation, MainTabParamList } from '../../navigation/AppNavigator';
 import { useLocalData } from '../../data/localData';
 
-type Nav = NativeStackNavigationProp<RootStackParamList>;
+type Nav = DashboardNavigation;
 
 export const InsightsScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
@@ -58,7 +58,7 @@ export const InsightsScreen: React.FC = () => {
     else if (tab === 'wallets') navigation.navigate('Wallets' as any);
   };
 
-  const routes: Record<string, keyof RootStackParamList> = {
+  const routes: Record<string, keyof RootStackParamList | keyof MainTabParamList> = {
     'ins-1': 'Budgets',
     'ins-2': 'Recurring',
     'ins-3': 'Transactions',

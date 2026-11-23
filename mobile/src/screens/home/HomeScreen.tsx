@@ -16,10 +16,10 @@ import { FeaturedPill } from '../../components/ui/FeaturedPill';
 import { SectionHeader } from '../../components/ui/SectionHeader';
 import { TransactionRow } from '../../components/ui/TransactionRow';
 import { FloatingNav, NavTab } from '../../components/ui/FloatingNav';
-import { RootStackParamList } from '../../navigation/AppNavigator';
+import { RootStackParamList, DashboardNavigation } from '../../navigation/AppNavigator';
 import { useLocalData, formatMoney } from '../../data/localData';
 
-type Nav = NativeStackNavigationProp<RootStackParamList>;
+type Nav = DashboardNavigation;
 
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();

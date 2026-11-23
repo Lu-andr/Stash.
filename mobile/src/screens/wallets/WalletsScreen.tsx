@@ -7,7 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../../navigation/AppNavigator';
+import { RootStackParamList, DashboardNavigation } from '../../navigation/AppNavigator';
 
 import { Palette,
   Colors, Gradients, Typography, Spacing, Radius, Shadow,
@@ -70,7 +70,7 @@ function WalletCard({ account, onEdit, onDelete }: { account: Wallet & { balance
   );
 }
 
-type Nav = NativeStackNavigationProp<RootStackParamList>;
+type Nav = DashboardNavigation;
 
 export const WalletsScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
