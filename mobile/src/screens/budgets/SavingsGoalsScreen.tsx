@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
 import { localStore } from '../../data/repository';
-import { newId, periodEnd } from '../../data/domain';
+import { CURRENCIES, newId, periodEnd } from '../../data/domain';
 import { useLocalData, GoalItem, formatMoney } from '../../data/localData';
 
 const GOAL_ICON_OPTIONS: Array<{ icon: keyof typeof Ionicons.glyphMap; label: string }> = [
@@ -26,6 +26,7 @@ const GOAL_ICON_OPTIONS: Array<{ icon: keyof typeof Ionicons.glyphMap; label: st
 export const SavingsGoalsScreen: React.FC = () => {
   const navigation = useNavigation();
   const { LOCAL_SAVINGS_GOALS: goals, state } = useLocalData();
+  const currencySymbol = CURRENCIES.find(c => c.value === state.settings.currency)?.symbol ?? state.settings.currency;
   const isLoading = false;
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
@@ -176,7 +177,7 @@ export const SavingsGoalsScreen: React.FC = () => {
 
                 <View style={styles.goalBottom}>
                   <Text style={styles.goalRemain}>
-                    {remaining > 0 ? `₹${remaining.toLocaleString('en-IN')} to go` : 'Goal Reached! 🎉'}
+                    {remaining > 0 ? `${formatMoney(remaining)} to go` : 'Goal Reached! 🎉'}
                   </Text>
                   <Text style={styles.goalTarget}>Target: {formatMoney(goal.targetAmount)}</Text>
                 </View>
@@ -218,7 +219,7 @@ export const SavingsGoalsScreen: React.FC = () => {
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Target Amount (₹)</Text>
+              <Text style={styles.fieldLabel}>Target Amount ({currencySymbol})</Text>
               <TextInput
                 style={styles.input}
                 placeholder="100000"
@@ -230,7 +231,7 @@ export const SavingsGoalsScreen: React.FC = () => {
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.fieldLabel}>Current Saved (₹)</Text>
+              <Text style={styles.fieldLabel}>Current Saved ({currencySymbol})</Text>
               <TextInput
                 style={styles.input}
                 placeholder="0"

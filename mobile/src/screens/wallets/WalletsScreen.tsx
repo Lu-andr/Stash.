@@ -38,18 +38,20 @@ function WalletCard({ account, onEdit, onDelete }: { account: Wallet & { balance
           {account.type === 'savings' ? <FontAwesome5 name="piggy-bank" size={20} color={Colors.text} /> : <Ionicons name={account.iconName as any} size={20} color={Colors.text} />}
         </View>
         <View style={styles.walletInfo}>
-          <Text style={styles.walletName}>{account.name}</Text>
-          <Text style={styles.walletMeta}>{account.currency + ' · Manual entry'}</Text>
+          <Text style={styles.walletName} numberOfLines={1}>{account.name}</Text>
+          <Text style={styles.walletMeta} numberOfLines={1}>{account.currency + ' · Manual entry'}</Text>
         </View>
-        <TouchableOpacity onPress={onEdit} accessibilityLabel={'Edit wallet ' + account.name} style={{ padding: 10 }}><Ionicons name="pencil-outline" size={18} color={Colors.textSecondary} /></TouchableOpacity>
-        <TouchableOpacity onPress={onDelete} accessibilityLabel={'Delete wallet ' + account.name} style={{ padding: 10 }}><Ionicons name="trash-outline" size={18} color={Colors.danger} /></TouchableOpacity>
+        <TouchableOpacity onPress={onEdit} accessibilityLabel={'Edit wallet ' + account.name} style={{ padding: 10, minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}><Ionicons name="pencil-outline" size={18} color={Colors.textSecondary} /></TouchableOpacity>
+        <TouchableOpacity onPress={onDelete} accessibilityLabel={'Delete wallet ' + account.name} style={{ padding: 10, minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' }}><Ionicons name="trash-outline" size={18} color={Colors.danger} /></TouchableOpacity>
       </View>
 
       {/* Balance */}
       <View style={styles.balanceRow}>
-        <View>
+        <View style={{ flex: 1, paddingRight: Spacing.sm }}>
           <Text style={styles.balanceLabel}>Balance</Text>
           <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
             style={[
               styles.balanceAmount,
               isNegative && { color: Colors.danger },
@@ -122,7 +124,7 @@ export const WalletsScreen: React.FC = () => {
           >
             <View style={styles.topHighlight} />
             <Text style={styles.netWorthLabel}>Recorded balances</Text>
-            {currencies.length ? currencies.map(currency => <Text key={currency} style={styles.netWorthAmount}>
+            {currencies.length ? currencies.map(currency => <Text key={currency} style={styles.netWorthAmount} numberOfLines={1} adjustsFontSizeToFit>
               {formatMoney(wallets.filter(w => w.currency === currency).reduce((sum, w) => sum + w.balance, 0), 2, currency)}
             </Text>) : <Text style={styles.netWorthAmount}>No wallets yet</Text>}
             <Text style={styles.netWorthSub}>Manual totals by currency · No conversion</Text>

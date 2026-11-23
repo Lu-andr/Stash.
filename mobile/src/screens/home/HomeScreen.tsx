@@ -21,26 +21,6 @@ import { useLocalData, formatMoney } from '../../data/localData';
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-// Animated balance count-up
-function BalanceDisplay({ value }: { value: number }) {
-  const animValue = useRef(new Animated.Value(0)).current;
-  const [displayText, setDisplayText] = useState('₹0.00');
-
-  useEffect(() => {
-    const listener = animValue.addListener(({ value: v }) => {
-      setDisplayText(formatMoney(v));
-    });
-    Animated.timing(animValue, {
-      toValue: value,
-      duration: 800,
-      useNativeDriver: false,
-    }).start();
-    return () => animValue.removeListener(listener);
-  }, [value]);
-
-  return <Text style={styles.balanceText}>{displayText}</Text>;
-}
-
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const { LOCAL_TRANSACTIONS, LOCAL_BALANCE, state } = useLocalData();

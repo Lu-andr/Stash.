@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Palette, Colors, Typography, Spacing, Radius } from '../../constants/theme';
 import { localStore } from '../../data/repository';
 import { useLocalState } from '../../context/LocalDataContext';
-import { newId } from '../../data/domain';
+import { CURRENCIES, newId } from '../../data/domain';
 import { RootStackParamList } from '../../navigation/AppNavigator';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -29,6 +29,7 @@ export const CreateBudgetScreen: React.FC = () => {
   const [period, setPeriod] = useState<'monthly' | 'weekly' | 'yearly'>('monthly');
   const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
   const state = useLocalState();
+  const currencySymbol = CURRENCIES.find(c => c.value === state.settings.currency)?.symbol ?? state.settings.currency;
   const categories = state.categories.filter(c => c.id !== 'cat-7').map(c => ({ id: c.id, name: c.label, icon: c.iconName, color: Colors.primary }));
   const [categoryBudgets, setCategoryBudgets] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -92,7 +93,7 @@ export const CreateBudgetScreen: React.FC = () => {
           <View style={styles.heroSection}>
             <Text style={styles.heroLabel}>TARGET BUDGET LIMIT</Text>
             <View style={styles.amountInputRow}>
-              <Text style={styles.currencySymbol}>₹</Text>
+              <Text style={styles.currencySymbol}>{currencySymbol}</Text>
               <TextInput
                 style={styles.amountInput}
                 value={totalAmount}
@@ -122,7 +123,7 @@ export const CreateBudgetScreen: React.FC = () => {
                       totalAmount === preset.toString() && styles.presetTextActive,
                     ]}
                   >
-                    ₹{(preset / 1000).toFixed(0)}k
+                    {currencySymbol}{(preset / 1000).toFixed(0)}k
                   </Text>
                 </TouchableOpacity>
               ))}

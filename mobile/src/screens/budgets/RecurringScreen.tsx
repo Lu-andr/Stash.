@@ -9,12 +9,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { Colors, Gradients, Typography, Spacing, Radius, Shadow } from '../../constants/theme';
 import { localStore } from '../../data/repository';
-import { newId, periodEnd } from '../../data/domain';
+import { CURRENCIES, newId, periodEnd } from '../../data/domain';
 import { useLocalData, RecurringItem, formatMoney } from '../../data/localData';
 
 export const RecurringScreen: React.FC = () => {
   const navigation = useNavigation();
   const { LOCAL_RECURRING_ITEMS: items, state } = useLocalData();
+  const currencySymbol = CURRENCIES.find(c => c.value === state.settings.currency)?.symbol ?? state.settings.currency;
   const isLoading = false;
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -218,7 +219,7 @@ export const RecurringScreen: React.FC = () => {
                 <Text style={styles.fieldLabel}>Subscription Name</Text>
                 <TextInput
                   style={styles.textInput}
-                  placeholder="e.g. Netflix, Spotify, Gym"
+                  placeholder="e.g. Rent, Membership, Gym"
                   placeholderTextColor={Colors.textMuted}
                   value={name}
                   onChangeText={setName}
@@ -226,7 +227,7 @@ export const RecurringScreen: React.FC = () => {
               </View>
 
               <View style={styles.fieldGroup}>
-                <Text style={styles.fieldLabel}>Monthly Amount (₹)</Text>
+                <Text style={styles.fieldLabel}>Monthly Amount ({currencySymbol})</Text>
                 <TextInput
                   style={styles.textInput}
                   placeholder="649"
