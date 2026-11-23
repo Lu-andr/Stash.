@@ -61,7 +61,14 @@ jobs:
               permissions = {p.get(key+'name') for p in root.findall('uses-permission')}
               assert not {'android.permission.INTERNET', 'android.permission.ACCESS_NETWORK_STATE'} & permissions
               assert root.find('application').get(key+'allowBackup') == 'false'
-          print('Release manifest has no network access or automatic backup')
+          res = Path('android/app/src/main/res')
+          for name in ['ic_launcher.xml', 'ic_launcher_round.xml']:
+              icon = ET.parse(res/'mipmap-anydpi-v26'/name).getroot()
+              assert icon.find('foreground').get(key+'drawable') == '@drawable/perago_launcher_foreground'
+          inset = ET.parse(res/'drawable/perago_launcher_foreground.xml').getroot()
+          assert all(inset.get(key+side) == '20%' for side in ['insetLeft', 'insetTop', 'insetRight', 'insetBottom'])
+          assert (res/'drawable-mdpi/splashscreen_logo.png').is_file()
+          print('Offline manifest and PeraGo launcher/splash resources verified')
           PY
       - run: cp mobile/android/app/build/outputs/apk/release/app-release.apk PeraGo-1.1.2-test-arm64.apk
       - uses: actions/upload-artifact@v4

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useSyncExternalStore } from 'react';
-import { View, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Image, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
 import { localStore } from '../data/repository';
 import { Spacing, Typography, type AppTheme } from '../constants/theme';
 import { useAppTheme, useThemedStyles } from './useAppTheme';
@@ -12,6 +12,7 @@ export function LocalDataProvider({ children }: { children: React.ReactNode }) {
   const load = () => { setError(''); localStore.load().then(() => setReady(true)).catch(e => setError(e.message || 'Could not open local data.')); };
   useEffect(load, []);
   if (!ready) return <View style={styles.loading}>
+    <Image source={require('../../assets/perago-icon.png')} style={{ width: 96, height: 96 }} resizeMode="contain" accessibilityLabel="PeraGo" />
     {error ? <><Text style={styles.text}>{error}</Text><Text style={styles.text}>Stored data has not been replaced. You can retry opening it.</Text>
       <TouchableOpacity accessibilityRole="button" onPress={load}><Text style={styles.retry}>Retry</Text></TouchableOpacity></> :
       <><ActivityIndicator color={Colors.primary} /><Text style={styles.text}>Opening local data…</Text></>}

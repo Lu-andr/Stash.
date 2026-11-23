@@ -15,7 +15,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
   onPress,
   disabled = false,
 }) => {
-  const { Palette, Gradients } = useAppTheme();
+  const { Colors, Palette, Gradients } = useAppTheme();
   const styles = useThemedStyles(createStyles);
 
   const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -39,7 +39,7 @@ export const PrimaryButton: React.FC<PrimaryButtonProps> = ({
         style={styles.touch}
       >
         <LinearGradient
-          colors={disabled ? [Palette.chartMuted, Palette.bgRaisedAlt] : Gradients.silver}
+          colors={disabled ? [Colors.surfaceAlt, Colors.surfaceAlt] : Gradients.silver}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.gradient}

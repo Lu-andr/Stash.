@@ -4,10 +4,10 @@
     "slug": "perago",
     "version": "1.1.2",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/perago-icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/perago-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#071426"
     },
@@ -20,7 +20,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/android-icon-foreground.png",
+        "foregroundImage": "./assets/perago-icon.png",
         "backgroundColor": "#071426"
       },
       "package": "app.stash",
@@ -38,7 +38,7 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/perago-icon.png"
     },
     "plugins": [
       "expo-font",
@@ -46,15 +46,16 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#071426",
-          "image": "./assets/splash-icon.png",
-          "imageWidth": 200,
+          "image": "./assets/perago-icon.png",
+          "imageWidth": 160,
           "resizeMode": "contain",
           "dark": {
             "backgroundColor": "#071426",
-            "image": "./assets/splash-icon.png"
+            "image": "./assets/perago-icon.png"
           }
         }
-      ]
+      ],
+      "./plugins/withPeraGoIcon.cjs"
     ],
     "updates": {
       "enabled": false

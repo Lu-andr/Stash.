@@ -41,7 +41,7 @@ export const SettingsScreen: React.FC = () => {
           <View style={styles.currencyIconWrap}><Ionicons name={isLight ? "sunny-outline" : "moon-outline"} size={18} color={Colors.text} /></View>
           <Text style={styles.rowLabel}>Light mode</Text><Switch accessibilityLabel="Light mode" value={prefs.theme === 'light'}
             onValueChange={value => updatePref('theme', value ? 'light' : 'dark')}
-            trackColor={{ false: Colors.surfaceAlt, true: Colors.primary }} thumbColor={Colors.onSilver} />
+            trackColor={{ false: Colors.surfaceAlt, true: Colors.primary }} thumbColor={isLight ? Colors.onSilver : Colors.text} />
         </View></View>
       </View>
       <View style={styles.sectionGroup}>

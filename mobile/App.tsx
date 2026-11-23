@@ -1,7 +1,7 @@
 import { useAppTheme } from './src/context/useAppTheme';
 import 'react-native-gesture-handler';
 import React, { useEffect } from 'react';
-import { View, ActivityIndicator, Appearance } from 'react-native';
+import { View, Image, ActivityIndicator, Appearance } from 'react-native';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -45,6 +45,7 @@ export default function App() {
   if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, backgroundColor: Palette.bgBase, justifyContent: 'center', alignItems: 'center' }}>
+        <Image source={require('./assets/perago-icon.png')} style={{ width: 96, height: 96, marginBottom: 24 }} resizeMode="contain" accessibilityLabel="PeraGo" />
         <ActivityIndicator size="large" color={Palette.silverTop} />
       </View>
     );
