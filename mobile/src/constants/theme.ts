@@ -1,4 +1,4 @@
-// ─── Stash Deep Navy Design Tokens ────────────────────────────────
+// ─── PeraGo Deep Navy Design Tokens ────────────────────────────────
 // Single source of truth. No raw hex values inside components.
 
 // ── Raw palette ──────────────────────────────────────────────────────────────

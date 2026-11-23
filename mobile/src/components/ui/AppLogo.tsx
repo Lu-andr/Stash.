@@ -30,11 +30,11 @@ export const AppLogo: React.FC<AppLogoProps> = ({ size = 'md' }) => {
             { width: circleSize - 2, borderRadius: (circleSize - 2) / 2 },
           ]}
         />
-        <Text style={[styles.monogram, { fontSize }]}>S</Text>
+        <Text style={[styles.monogram, { fontSize }]}>P</Text>
       </LinearGradient>
 
       {/* Wordmark */}
-      <Text style={styles.wordmark}>Stash</Text>
+      <Text style={styles.wordmark}>PeraGo</Text>
     </View>
   );
 };

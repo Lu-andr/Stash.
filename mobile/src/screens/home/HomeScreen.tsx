@@ -214,7 +214,7 @@ export const HomeScreen: React.FC = () => {
             <View style={styles.menuHeader}>
               <View>
                 <Text style={styles.menuTitle}>Menu</Text>
-                <Text style={styles.menuSubtitle}>Stash Finance</Text>
+                <Text style={styles.menuSubtitle}>PeraGo</Text>
               </View>
               <TouchableOpacity
                 onPress={() => setMenuVisible(false)}

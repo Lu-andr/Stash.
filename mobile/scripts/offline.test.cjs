@@ -146,3 +146,19 @@ test('snapshots cannot be mutated outside the serialized store', async () => {
   const { store } = await setup(); assert.equal(Object.isFrozen(store.getSnapshot().wallets), true);
   assert.throws(() => store.getSnapshot().wallets.push({}), TypeError);
 });
+for (const currency of ['PHP', 'VND', 'KZT', 'UZS', 'ZAR', 'RUB']) {
+  test(currency + ' wallets, transactions and report settings survive reload', async () => {
+    const { store, disk } = await setup();
+    await store.saveWallet({ name: 'Local wallet', type: 'wallet', currency, initialBalance: 100 });
+    const walletId = store.getSnapshot().wallets.at(-1).id;
+    await store.saveTransaction(entry({ walletId, amount: 12.25 }));
+    await store.updateSettings({ currency });
+    const restarted = createLocalStore(disk); await restarted.load();
+    const state = restarted.getSnapshot();
+    assert.equal(state.settings.currency, currency);
+    assert.equal(state.wallets.find(w => w.id === walletId).currency, currency);
+    assert.equal(state.transactions[0].currency, currency);
+    assert.equal(projectLocalData(state).LOCAL_BALANCE, 87.75);
+    assert.equal(state.wallets.find(w => w.id === 'wallet-cash').currency, 'INR');
+  });
+}

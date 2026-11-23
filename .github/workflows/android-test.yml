@@ -1,4 +1,4 @@
-name: Android test APK
+name: PeraGo Android test APK
 
 on:
   push:
@@ -63,10 +63,10 @@ jobs:
               assert root.find('application').get(key+'allowBackup') == 'false'
           print('Release manifest has no network access or automatic backup')
           PY
-      - run: cp mobile/android/app/build/outputs/apk/release/app-release.apk Stash-offline-1.1.0-test-arm64.apk
+      - run: cp mobile/android/app/build/outputs/apk/release/app-release.apk PeraGo-1.1.1-test-arm64.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: Stash-offline-test-arm64
-          path: Stash-offline-1.1.0-test-arm64.apk
+          name: PeraGo-test-arm64
+          path: PeraGo-1.1.1-test-arm64.apk
           if-no-files-found: error
           retention-days: 30

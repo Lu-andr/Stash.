@@ -1,4 +1,4 @@
-export type Currency = 'INR' | 'USD' | 'EUR' | 'GBP';
+export type Currency = typeof CURRENCIES[number]['value'];
 export type WalletType = 'cash' | 'card' | 'savings' | 'wallet';
 export interface Wallet { id: string; name: string; type: WalletType; currency: Currency; initialBalance: number }
 export interface LocalCategory { id: string; label: string; iconName: string }
@@ -22,6 +22,12 @@ export interface LocalState {
   settings: LocalSettings;
 }
 export const CURRENCIES = [
+  { value: 'PHP', label: 'Philippine Peso', symbol: '₱' },
+  { value: 'VND', label: 'Vietnamese Dong', symbol: '₫' },
+  { value: 'KZT', label: 'Kazakhstani Tenge', symbol: '₸' },
+  { value: 'UZS', label: 'Uzbekistani Som', symbol: 'soʻm' },
+  { value: 'ZAR', label: 'South African Rand', symbol: 'R' },
+  { value: 'RUB', label: 'Russian Ruble', symbol: '₽' },
   { value: 'INR', label: 'Indian Rupee', symbol: '₹' },
   { value: 'USD', label: 'US Dollar', symbol: '$' },
   { value: 'EUR', label: 'Euro', symbol: '€' },

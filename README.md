@@ -1,5 +1,5 @@
-# Stash — local personal tracker
-Stash records manually entered wallets, income, expenses, budget limits, recurring entries and savings goals on the device. It has no registration, server, bank connections, real payments, lending, cloud synchronization, telemetry or remote assistant.
+# PeraGo — local personal tracker
+PeraGo records manually entered wallets, income, expenses, budget limits, recurring entries and savings goals on the device. It has no registration, server, bank connections, real payments, lending, cloud synchronization, telemetry or remote assistant.
 
 ## Run
 Use Node 22 and Java 21. In mobile:
